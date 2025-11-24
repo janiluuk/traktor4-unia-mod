@@ -26,6 +26,16 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
   - Display Settings (general, browser, track/stem deck, remix deck)
   - Other Settings (timers, fixes, mods, import/export, Mix Recorder control with elapsed time)
 
+### On-controller menu (S5/S8)
+- **Toggle:** Hold **Shift** and press **Back** to open/close the on-screen Settings menu when you’re not in the Browser.
+- **Navigation:** Browse encoder turn = move selection · **Push** = enter/confirm · **Back** = go up a level.
+- **Contents:**
+  - Traktor Settings
+  - S5/S8 Controller Settings (touch controls, touchstrip, LEDs, MIDI/Stem options)
+  - Map Settings (buttons, encoders, pads, faders)
+  - Display Settings (general, browser, track/stem deck, remix deck)
+  - Other Settings (timers, fixes, mods, import/export, Mix Recorder control with elapsed time)
+
 ### On-device screens (S5 via S8 views)
 - **Deck HUD clarity**  
   Compact header shows **Title → Artist → BPM → Key → Phase**, with predictable truncation so the important data stays visible.
