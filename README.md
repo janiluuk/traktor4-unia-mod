@@ -11,8 +11,10 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
   Turn = list navigation · **Shift+Turn** = cycle sort column · **Push** = load to focused deck · **Shift+Push** = pre-listen.
 - **Loop Encoder ergonomics**  
   Turn = loop size step · **Push** = set in/out · **Shift** = fine step.
-- **Touch Strips, performance-first**  
+- **Touch Strips, performance-first**
   Default = pitch bend · **Shift** = seek (fast, precise scrubbing).
+- **Cue drops without leaving the deck**
+  Hold **Shift + Cue** to store the current track position as the Active Cue; tap **Shift + Cue** to keep the standard restart.
 - **Pads with clear layer logic**
   Hotcues / Loops as primary layers; alternate layers on **Shift**. LEDs colored by cue type for instant recognition.
 
@@ -82,9 +84,11 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
   Turn = navigate · **Shift+Turn** = sort column · **Push** = load · **Shift+Push** = pre-listen  
 - **Loop Encoder**:  
   Turn = size · **Push** = loop in/out · **Shift** = fine step  
-- **Touch Strips**:  
-  Default = bend · **Shift** = seek  
-- **Pads**:  
+- **Touch Strips**:
+  Default = bend · **Shift** = seek
+- **Cue (Shift)**:
+  Tap = restart from beginning; **Hold** = store a new Active Cue at the current playhead
+- **Pads**:
   Primary = Hotcues/Loops · Alternate layers on **Shift** · LED colors reflect cue types
 
 ---

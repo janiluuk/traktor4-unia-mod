@@ -4122,6 +4122,9 @@ Module
       Wire { from: "%surface%.play"; to: "decks.1.transport.timecode"     }
       Wire { from: "%surface%.cue";  to: "decks.1.transport.return_to_zero" }
       Wire { from: "%surface%.sync"; to: "decks.1.transport.master"; enabled: (editMode.value != editModeArmed) && (editMode.value != editModeUsed) }
+
+      Wire { from: "%surface%.cue.value"; to: "DeckA_SetCueHold.input" }
+      Wire { from: "DeckA_SetCueHold.output"; to: TriggerPropertyAdapter { path: "app.traktor.decks.1.track.cue.store" } }
     }
 
     WiresGroup
@@ -4180,6 +4183,9 @@ Module
       Wire { from: "%surface%.play"; to: "decks.2.transport.timecode"     }
       Wire { from: "%surface%.cue";  to: "decks.2.transport.return_to_zero" }
       Wire { from: "%surface%.sync"; to: "decks.2.transport.master"; enabled: (editMode.value != editModeArmed) && (editMode.value != editModeUsed) }
+
+      Wire { from: "%surface%.cue.value"; to: "DeckB_SetCueHold.input" }
+      Wire { from: "DeckB_SetCueHold.output"; to: TriggerPropertyAdapter { path: "app.traktor.decks.2.track.cue.store" } }
     }
 
     WiresGroup
@@ -4238,6 +4244,9 @@ Module
       Wire { from: "%surface%.play"; to: "decks.3.transport.timecode"     }
       Wire { from: "%surface%.cue";  to: "decks.3.transport.return_to_zero" }
       Wire { from: "%surface%.sync"; to: "decks.3.transport.master"; enabled: (editMode.value != editModeArmed) && (editMode.value != editModeUsed) }
+
+      Wire { from: "%surface%.cue.value"; to: "DeckC_SetCueHold.input" }
+      Wire { from: "DeckC_SetCueHold.output"; to: TriggerPropertyAdapter { path: "app.traktor.decks.3.track.cue.store" } }
     }
 
     WiresGroup
@@ -4296,6 +4305,9 @@ Module
       Wire { from: "%surface%.play"; to: "decks.4.transport.timecode"     }
       Wire { from: "%surface%.cue";  to: "decks.4.transport.return_to_zero" }
       Wire { from: "%surface%.sync"; to: "decks.4.transport.master"; enabled: (editMode.value != editModeArmed) && (editMode.value != editModeUsed) }
+
+      Wire { from: "%surface%.cue.value"; to: "DeckD_SetCueHold.input" }
+      Wire { from: "DeckD_SetCueHold.output"; to: TriggerPropertyAdapter { path: "app.traktor.decks.4.track.cue.store" } }
     }
 
     WiresGroup
@@ -4358,15 +4370,19 @@ Module
 
   CopyMasterPhase { name: "DeckA_CopyMasterPhase";  channel: 1 }
   SwitchTimer { name: "DeckA_CopyMasterPhase_Switch"; setTimeout: 1000 }
+  SwitchTimer { name: "DeckA_SetCueHold"; setTimeout: 500 }
 
   CopyMasterPhase { name: "DeckB_CopyMasterPhase";  channel: 2 }
   SwitchTimer { name: "DeckB_CopyMasterPhase_Switch"; setTimeout: 1000 }
+  SwitchTimer { name: "DeckB_SetCueHold"; setTimeout: 500 }
 
   CopyMasterPhase { name: "DeckC_CopyMasterPhase";  channel: 3 }
   SwitchTimer { name: "DeckC_CopyMasterPhase_Switch"; setTimeout: 1000 }
+  SwitchTimer { name: "DeckC_SetCueHold"; setTimeout: 500 }
 
   CopyMasterPhase { name: "DeckD_CopyMasterPhase";  channel: 4 }
   SwitchTimer { name: "DeckD_CopyMasterPhase_Switch"; setTimeout: 1000 }
+  SwitchTimer { name: "DeckD_SetCueHold"; setTimeout: 500 }
   
   Blinker { name: "CopyMasterPhase_Blinker"; cycle: 300; repetitions: 3; defaultBrightness: onBrightness; blinkBrightness: dimmedBrightness; color: Color.Green }
 
