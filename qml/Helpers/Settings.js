@@ -85,7 +85,7 @@ function updateModSettings(device, settings, autoAssign = true) {
     assignSetting(settings, 'others.autoexport', autoExport);
 
     // ? Prevent auto-assigning if auto-import is disabled when a device is connected
-    if (!autoAssign && !autoImport) return;
+    if (!autoAssign && !autoImport.value) return;
 
     console.log(`Assigning ${device.toUpperCase()} settings...`);
 
