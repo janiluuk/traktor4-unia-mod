@@ -93,7 +93,8 @@ FullscreenOverlay {
         readonly property variant s5Names: ["Touch Controls", "Touchstrip", "LEDs", "Stem Controls"]
         readonly property variant mapNames: ["Play Button", "Cue Button", "Sync Button", "Browse Encoder", isTraktorS5 ? "Loop Encoder" : "FX Select Button", isTraktorS5 ? "Hotcue Button" : "Loop Button", "Freeze Button", "Pads", "Faders" ]
         readonly property variant displayNames: ["General", "Browser", "Track/Stem Deck", "Remix Deck"]
-        readonly property variant otherNames: ["Timers", "Fixes", "Mods", "Import/Export"]
+        readonly property variant otherNames: ["Timers", "Fixes", "Mods", "Import/Export", "Recording"]
+        readonly property variant recordingNames: ["Mix Recorder"]
 
         function secondSettingsListNames(index){
             if (index == 1) return traktorNames
@@ -210,6 +211,7 @@ FullscreenOverlay {
                 else if (secondIndex == 2) return fixesNames
                 else if (secondIndex == 3) return modsNames
                 else if (secondIndex == 4) return importExportNames
+                else if (secondIndex == 5) return recordingNames
             }
         }
 

@@ -27,7 +27,7 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
   - S5/S8 Controller Settings (touch controls, touchstrip, LEDs, MIDI/Stem options)
   - Map Settings (buttons, encoders, pads, faders)
   - Display Settings (general, browser, track/stem deck, remix deck)
-  - Other Settings (timers, fixes, mods, import/export)
+  - Other Settings (timers, fixes, mods, import/export, Mix Recorder control with elapsed time)
 
 ### On-device screens (S5 via S8 views)
 - **Deck HUD clarity**  
@@ -98,6 +98,11 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
   1. Hold **Shift** and press **Back** while you are on a deck or FX view (not in the Browser).
   2. Turn the Browse Encoder to move, press it to enter/confirm, and press **Back** again to exit a section.
   3. Repeat **Shift + Back** to close the menu and return to the deck view.
+
+- **Start or stop the Mix Recorder from the controller**
+  1. Open the Settings menu and navigate to **Other Settings → Recording → Mix Recorder**.
+  2. Press the Browse Encoder on **Start Recording** (or **Stop Recording**). The second line shows the elapsed time for the current take so you can monitor length without looking at the laptop.
+  3. Exit with **Back**; recording continues until you stop it from this entry or in Traktor’s UI.
 
 - **Set an Active Cue from the controller**
   1. Play or pause the track where you want the cue.

@@ -112,6 +112,10 @@ Item {
     AppProperty { id: deckCSync; path: "app.traktor.decks.3.sync.enabled" }
     AppProperty { id: deckDSync; path: "app.traktor.decks.4.sync.enabled" }
 
+    //Mix Recorder
+    AppProperty { id: mixRecorderActive; path: "app.traktor.mix_recorder.is_recording"; onValueChanged: { updateSettings(firstIndex, secondIndex, thirdIndex, 0, 0) } }
+    AppProperty { id: mixRecorderElapsedMs; path: "app.traktor.mix_recorder.elapsed_ms"; onValueChanged: { updateSettings(firstIndex, secondIndex, thirdIndex, 0, 0) } }
+
 //------------------------------------------------------------------------------------------------------------------
 // SETTINGS IMPORT/EXPORT
 //------------------------------------------------------------------------------------------------------------------
@@ -452,6 +456,21 @@ Item {
     property variant dataNames: []
     property variant highlightText: []
     property variant descriptionText: []
+
+    function formatRecordingTime(ms) {
+        if (ms === undefined || ms < 0) return "--:--";
+
+        var totalSeconds = Math.floor(ms / 1000);
+        var minutes = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
+        var hours = Math.floor(minutes / 60);
+        minutes = minutes % 60;
+
+        var minutePart = (hours > 0 && minutes < 10 ? "0" : "") + minutes;
+        var secondPart = (seconds < 10 ? "0" : "") + seconds;
+
+        return (hours > 0 ? hours + ":" : "") + minutePart + ":" + secondPart;
+    }
 
     Item {
         anchors.fill: parent
@@ -1494,6 +1513,20 @@ Item {
                     }
                 }
             }
+            // Recording
+            else if (secondIndex == 5) {
+                if (thirdIndex == 1) {
+                    if (info == 1) return dataNames[index]
+                    else if (info == 2) return highlightText[index]
+                    else if (info == 3) return descriptionText[index]
+                    else {
+                        var elapsed = mixRecorderElapsedMs.value === undefined ? 0 : mixRecorderElapsedMs.value
+                        dataNames = [mixRecorderActive.value ? "Stop Recording" : "Start Recording", "Elapsed: " + formatRecordingTime(elapsed)]
+                        highlightText = [mixRecorderActive.value, false]
+                        descriptionText = ["Toggle the Mix Recorder without leaving the hardware", "Shows how long the current take has been running"]
+                    }
+                }
+            }
         }
     }
 
@@ -2043,6 +2076,12 @@ Item {
                             exportSettings()
                         }
                     }
+                }
+            }
+            //Recording
+            else if (secondIndex == 5) {
+                if (thirdIndex == 1 && currentIndex == 0) {
+                    mixRecorderActive.value = !mixRecorderActive.value
                 }
             }
         }
