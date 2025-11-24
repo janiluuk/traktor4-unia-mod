@@ -56,6 +56,17 @@ Module {
 
         Wire { from: "%surface%.back.color1"; to: ButtonScriptAdapter { color: LED.legacy(deckId) } }
 
+        //On-screen Settings menu toggle
+        Wire {
+            enabled: shift && screenOverlay.value == Overlay.none && screenView.value != ScreenView.browser
+            from: "%surface%.back"
+            to: ButtonScriptAdapter {
+                onPress: {
+                    screenView.value = screenView.value == ScreenView.settings ? ScreenView.deck : ScreenView.settings
+                }
+            }
+        }
+
         //Browser
         WiresGroup {
             enabled: screenView.value == ScreenView.browser

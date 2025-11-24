@@ -11,10 +11,22 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
   Turn = list navigation · **Shift+Turn** = cycle sort column · **Push** = load to focused deck · **Shift+Push** = pre-listen.
 - **Loop Encoder ergonomics**  
   Turn = loop size step · **Push** = set in/out · **Shift** = fine step.
-- **Touch Strips, performance-first**  
+- **Touch Strips, performance-first**
   Default = pitch bend · **Shift** = seek (fast, precise scrubbing).
-- **Pads with clear layer logic**  
+- **Cue drops without leaving the deck**
+  Hold **Shift + Cue** to store the current track position as the Active Cue; tap **Shift + Cue** to keep the standard restart.
+- **Pads with clear layer logic**
   Hotcues / Loops as primary layers; alternate layers on **Shift**. LEDs colored by cue type for instant recognition.
+
+### On-controller menu (S5/S8)
+- **Toggle:** Hold **Shift** and press **Back** to open/close the on-screen Settings menu when you’re not in the Browser.
+- **Navigation:** Browse encoder turn = move selection · **Push** = enter/confirm · **Back** = go up a level.
+- **Contents:**
+  - Traktor Settings
+  - S5/S8 Controller Settings (touch controls, touchstrip, LEDs, MIDI/Stem options)
+  - Map Settings (buttons, encoders, pads, faders)
+  - Display Settings (general, browser, track/stem deck, remix deck)
+  - Other Settings (timers, fixes, mods, import/export)
 
 ### On-device screens (S5 via S8 views)
 - **Deck HUD clarity**  
@@ -72,17 +84,24 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
   Turn = navigate · **Shift+Turn** = sort column · **Push** = load · **Shift+Push** = pre-listen  
 - **Loop Encoder**:  
   Turn = size · **Push** = loop in/out · **Shift** = fine step  
-- **Touch Strips**:  
-  Default = bend · **Shift** = seek  
-- **Pads**:  
+- **Touch Strips**:
+  Default = bend · **Shift** = seek
+- **Cue (Shift)**:
+  Tap = restart from beginning; **Hold** = store a new Active Cue at the current playhead
+- **Pads**:
   Primary = Hotcues/Loops · Alternate layers on **Shift** · LED colors reflect cue types
+
+### Pad FX presets
+- **Slot 1 (factory-populated):** Echo Fade · Echo Multi · Techno Phil · Space Toys · Echo Fade* (sweep) · Echo Multi* (macro) · Filter Pulse* · Electro Flyby*.
+- **Create your own:** Edit `qml/Settings/PadFXs.qml` → populate the blank PadFX slots (2.1–8.8) with a `name`, `color`, `routing`, three `effect` slots, and initial `drywet`/`knob`/`button` values. Use the supported color list, routing types, and effect names documented at the top of the file as the source of truth. Save and reload Traktor to pick up changes.
 
 ---
 
 ## Compatibility
 
-- Built for **Traktor Pro 4**.  
-- S5 uses S8 screen components; all bindings routed through `Defines/AppPaths.qml` to cushion NI property name changes.  
+- Built for **Traktor Pro 4**.
+- Bundle trimmed to **S5/S8** mappings and screens only (other device templates removed).
+- S5 uses S8 screen components; all bindings routed through `Defines/AppPaths.qml` to cushion NI property name changes.
 - QML imports favor **QtQuick 2.0** to avoid version-pin issues in TP4.
 
 ---
@@ -92,10 +111,11 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
 ```
 qml/
   CSI/S5/                # S5 mapping modules (encoders, pads, side, mixer, deck)
-  Screens/S8/Views/...   # Deck & Browser UI used by S5 screens
+  CSI/S8/                # S8 mapping modules
+  Screens/S8/Views/...   # Deck & Browser UI used by S5/S8 screens
   Defines/AppPaths.qml   # Centralized app property path helpers
   Helpers/               # Utilities (LED maps, helpers)
-  Settings/              # QML settings panes (if present)
+  Settings/              # QML settings panes (menu content)
   Assets/                # Fonts, images
 README.md
 Settings.tsi             # Preferences snapshot (reference)

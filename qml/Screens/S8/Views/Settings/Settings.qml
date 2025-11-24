@@ -13,7 +13,6 @@ FullscreenOverlay {
 
     readonly property bool isTraktorS5: screen.flavor == ScreenFlavor.S5
     readonly property bool isTraktorS8: screen.flavor == ScreenFlavor.S8
-    readonly property bool isTraktorD2: screen.flavor == ScreenFlavor.D2
 
 //------------------------------------------------------------------------------------------------------------------
 // SUPREME EDITION
@@ -52,7 +51,7 @@ FullscreenOverlay {
 
         property int selectedIndex: 0
 
-        model: ["(NW) Traktor Settings", isTraktorS5  ? "Traktor S5 Settings" : (isTraktorS8 ? "Traktor S8 Settings" : "Traktor D2 Settings"), "Map Settings", "Display Settings", "Other Settings"]
+        model: ["(NW) Traktor Settings", isTraktorS5  ? "Traktor S5 Settings" : "Traktor S8 Settings", "Map Settings", "Display Settings", "Other Settings"]
         delegate:
             Item {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -92,7 +91,7 @@ FullscreenOverlay {
         readonly property variant traktorNames: ["Audio Setup", "Output Routing", "Input Routing", "External Sync", "Timecode Setup", "Loading", "Transport", "Decks Layout", "Track Decks", "Remix Decks", "Mixer", "Global Settings", "Effects", "Mix Recorder", "Loop Recorder", "Browser Details", "File Management", "Analyze Options"]
         readonly property variant s8Names: ["Touch Controls", "Touchstrip", "LEDs", "MIDI"]
         readonly property variant s5Names: ["Touch Controls", "Touchstrip", "LEDs", "Stem Controls"]
-        readonly property variant mapNames: ["Play Button", "Cue Button", "Sync Button", "Browse Encoder", isTraktorS5 ? "Loop Encoder" : "FX Select Button", isTraktorS5 ? "Hotcue Button" : "Loop Button", "Freeze Button", "Pads", isTraktorD2 ? "D2 Buttons" : "Faders" ]
+        readonly property variant mapNames: ["Play Button", "Cue Button", "Sync Button", "Browse Encoder", isTraktorS5 ? "Loop Encoder" : "FX Select Button", isTraktorS5 ? "Hotcue Button" : "Loop Button", "Freeze Button", "Pads", "Faders" ]
         readonly property variant displayNames: ["General", "Browser", "Track/Stem Deck", "Remix Deck"]
         readonly property variant otherNames: ["Timers", "Fixes", "Mods", "Import/Export"]
 
@@ -165,7 +164,6 @@ FullscreenOverlay {
         readonly property variant freezeNames: ["Freeze", "Shift + Freeze"]
         readonly property variant padsNames: ["Slot Selector Mode", "Hotcues Play Mode", "Hotcue Colors"]
         readonly property variant fadersNames: ["Fader Start"]
-        readonly property variant d2Names: ["D2 Deck Buttons"]
 
         //Display Settings
         readonly property variant deckGeneralNames: ["Theme", "Panels", "Bright Mode (BETA)", "Top Left Corner"]
@@ -177,7 +175,6 @@ FullscreenOverlay {
         readonly property variant timersNames: ["Browser View", "BPM/Key Overlay", "Mixer FX Overlay", "HotcueType Overlay", "Side Buttons Overlay"]
         readonly property variant fixesNames: ["BPM Controls", "Hotcue Triggering"]
         readonly property variant modsNames: ["Only focused controls", "Beatmatch Practice", "Autoenable Flux", "AutoZoom Edit Mode", "Shift Mode"]
-        readonly property variant modsNamesD2: ["Only focused controls", "Beatmatch Practice", "Autoenable Flux", "AutoZoom Edit Mode"]
         readonly property variant importExportNames: ["Import", "Export"]
 
         function thirdSettingsListNames(firstIndex, secondIndex){
@@ -200,8 +197,7 @@ FullscreenOverlay {
                 else if (secondIndex == 6) return isTraktorS5 ? hotcueNames : loopNames
                 else if (secondIndex == 7) return freezeNames
                 else if (secondIndex == 8) return padsNames
-                else if (secondIndex == 9 && !isTraktorD2) return fadersNames
-                else if (secondIndex == 9 && isTraktorD2) return d2Names
+                else if (secondIndex == 9) return fadersNames
             }
             else if (firstIndex == 4) { //Display Settings
                 if (secondIndex == 1) return deckGeneralNames
@@ -212,7 +208,7 @@ FullscreenOverlay {
             else if (firstIndex == 5) { //Other Settings
                 if (secondIndex == 1) return timersNames
                 else if (secondIndex == 2) return fixesNames
-                else if (secondIndex == 3) return isTraktorD2 ? modsNamesD2 : modsNames
+                else if (secondIndex == 3) return modsNames
                 else if (secondIndex == 4) return importExportNames
             }
         }

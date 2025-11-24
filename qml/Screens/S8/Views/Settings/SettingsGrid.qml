@@ -11,7 +11,7 @@ Item {
 
     readonly property bool isTraktorS5: screen.flavor == ScreenFlavor.S5
     readonly property bool isTraktorS8: screen.flavor == ScreenFlavor.S8
-    readonly property bool isTraktorD2: screen.flavor == ScreenFlavor.D2
+    readonly property bool isTraktorD2: false
 
 //------------------------------------------------------------------------------------------------------------------
 // EDITABLE SETTINGS
@@ -419,9 +419,6 @@ Item {
             case isTraktorS8:
                 Settings.exportSettings(root.value, settings, "s8")
                 break;
-            case isTraktorD2:
-                Settings.exportSettings(root.value, settings, "d2")
-                break;
             default:
                 break;
         }
@@ -439,12 +436,6 @@ Item {
             case isTraktorS8:
                 Settings.importSettings(root.value, "s8").catch((error) => {
                     console.log("An error occured while importing S8 Settings... Error:\n", error)
-                    throw error
-                })
-                break;
-            case isTraktorD2:
-                Settings.importSettings(root.value, "d2").catch((error) => {
-                    console.log("An error occured while importing D2 Settings... Error:\n", error)
                     throw error
                 })
                 break;
@@ -786,12 +777,12 @@ Item {
                         if (isTraktorD2) {
                             dataNames = ["Disabled", "Instant Doubles", "Load next", "Load previous", "MixerFX On/Off"]
                             highlightText = [shiftBrowsePush.value == 0, shiftBrowsePush.value == 1, shiftBrowsePush.value == 2, shiftBrowsePush.value == 3, shiftBrowsePush.value == 4]
-                            descriptionText = ["Disabled", "Duplicate the opposite deck (only works on the S5/S8/S4MK3)", "Load next track", "Load previous track", "Toggle on/off the MixerFX"]
+                            descriptionText = ["Disabled", "Duplicate the opposite deck (only works on the S5/S8)", "Load next track", "Load previous track", "Toggle on/off the MixerFX"]
                         }
                         else {
                             dataNames = ["Disabled", "Instant Doubles", "Load next", "Load previous"]
                             highlightText = [shiftBrowsePush.value == 0, shiftBrowsePush.value == 1, shiftBrowsePush.value == 2, shiftBrowsePush.value == 3]
-                            descriptionText = ["Disabled", "Duplicate the opposite deck (only works on the S5/S8/S4MK3)", "Load next track", "Load previous track"]
+                            descriptionText = ["Disabled", "Duplicate the opposite deck (only works on the S5/S8)", "Load next track", "Load previous track"]
                         }
                     }
                 }
@@ -854,7 +845,7 @@ Item {
                     }
                 }
             }
-            //FX Select Button (S8/D2 Only)
+            //FX Select Button (S8 Only)
             else if (secondIndex == 5 && !isTraktorS5) {
                 //FX Select
                 if (thirdIndex == 1) {
@@ -904,7 +895,7 @@ Item {
                     }
                 }
             }
-            //Loop Button (S8/D2 Only)
+            //Loop Button (S8 Only)
             else if (secondIndex == 6 && !isTraktorS5) {
                 //Loop
                 if (thirdIndex == 1) {
@@ -914,7 +905,7 @@ Item {
                     else {
                         dataNames = ["Default Mode", "Advanced Mode", "Loop Roll"]
                         highlightText = [loopButton.value == 0, loopButton.value == 1, loopButton.value == 2]
-                        descriptionText = ["Default S8/D2 Loop Mode (Top 4 pads: Loop Roll, Bottom 4 pads: BeatJumps)", "6 BeatJumps + Loop In/Out controls", "Full 8-pad Loop Roll"]
+                        descriptionText = ["Default S8 Loop Mode (Top 4 pads: Loop Roll, Bottom 4 pads: BeatJumps)", "6 BeatJumps + Loop In/Out controls", "Full 8-pad Loop Roll"]
                     }
                 }
                 //Shift + Loop
@@ -925,7 +916,7 @@ Item {
                     else {
                         dataNames = ["Default Mode", "Advanced Mode", "Loop Roll"]
                         highlightText = [shiftLoopButton.value == 0, shiftLoopButton.value == 1, shiftLoopButton.value == 2]
-                        descriptionText = ["Default S8/D2 Loop Mode (Top 4 pads: Loop Roll, Bottom 4 pads: BeatJumps)", "6 BeatJumps + Loop In/Out controls", "Full 8-pad Loop Roll"]
+                        descriptionText = ["Default S8 Loop Mode (Top 4 pads: Loop Roll, Bottom 4 pads: BeatJumps)", "6 BeatJumps + Loop In/Out controls", "Full 8-pad Loop Roll"]
                     }
                 }
             }
@@ -937,9 +928,9 @@ Item {
                     else if (info == 2) return highlightText[index]
                     else if (info == 3) return descriptionText[index]
                     else {
-                        dataNames = ["S8/D2 Default Mode", "Advanced Mode", "Loop Roll", "Tone Play Mode"]
+                        dataNames = ["Default Mode", "Advanced Mode", "Loop Roll", "Tone Play Mode"]
                         highlightText = [shiftHotcueButton.value == 0, shiftHotcueButton.value == 1, shiftHotcueButton.value == 2, shiftHotcueButton.value == 3]
-                        descriptionText = ["Default S8/D2 Loop Mode (Top 4 pads: Loop Roll, Bottom 4 pads: BeatJumps)", "6 BeatJumps + Loop In/Out controls", "Full 8-pad Loop Roll", "Tone Play pads"]
+                        descriptionText = ["Default Loop Mode (Top 4 pads: Loop Roll, Bottom 4 pads: BeatJumps)", "6 BeatJumps + Loop In/Out controls", "Full 8-pad Loop Roll", "Tone Play pads"]
                     }
                 }
             }
@@ -1658,7 +1649,7 @@ Item {
                     else if (currentIndex == 1) {integerEditor.value = !integerEditor.value; stepShiftTempoEditor.value = !stepShiftTempoEditor.value }
                 }
             }
-            //FX Select Button (S8/D2 Only)
+            //FX Select Button (S8 Only)
             else if (secondIndex == 5 && !isTraktorS5) {
                 //FX Select
                 if (thirdIndex == 1) {
@@ -1680,7 +1671,7 @@ Item {
                     shiftLoopEncoderInBrowser.value = currentIndex
                 }
             }
-            //Loop Button (S8/D2 Only)
+            //Loop Button (S8 Only)
             else if (secondIndex == 6 && !isTraktorS5) {
                 //Loop
                 if (thirdIndex == 1) {
