@@ -1,7 +1,7 @@
-# Traktor Pro 4 — S5 / S8 Overhaul 
+# Pro MOD for Traktor Pro 4.0+ with S5 / S8 controller
 
-Rewritten UI which brings lot of new features and usability enhancements to S5 / S8 controllers.
 ---
+Rewritten UI which brings lot of new features, usability enhancements to S5 / S8 controllers.
 
 ## What’s inside
 
