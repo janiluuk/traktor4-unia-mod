@@ -92,6 +92,27 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
 - **Pads**:
   Primary = Hotcues/Loops · Alternate layers on **Shift** · LED colors reflect cue types
 
+### Quick how-to guides
+
+- **Open the on-controller Settings menu**
+  1. Hold **Shift** and press **Back** while you are on a deck or FX view (not in the Browser).
+  2. Turn the Browse Encoder to move, press it to enter/confirm, and press **Back** again to exit a section.
+  3. Repeat **Shift + Back** to close the menu and return to the deck view.
+
+- **Set an Active Cue from the controller**
+  1. Play or pause the track where you want the cue.
+  2. Hold **Shift** and press **Cue** for a moment—Traktor stores that playhead position as the new Active Cue.
+  3. Tap **Shift + Cue** (without holding) any time to jump back to that saved start point.
+
+- **Flip browser sort direction**
+  1. Enter Browser Sorting mode (Shift + Browse turn) to pick a column.
+  2. Press the **Loop Encoder** once to toggle between ascending and descending without changing the chosen column.
+
+- **Create custom Pad FX presets**
+  1. Open `qml/Settings/PadFXs.qml` and scroll past the prefilled Slot 1 examples.
+  2. For any empty slot (2.1–8.8), add a `name`, choose a pad `color`, set `routing` and three `effect` blocks with `drywet`/`knob`/`button` values.
+  3. Use the valid colors, routings, and effect names listed at the top of `PadFXs.qml`, save the file, and reload Traktor to see your pads.
+
 ### Pad FX presets
 - **Slot 1 (factory-populated):** Echo Fade · Echo Multi · Techno Phil · Space Toys · Echo Fade* (sweep) · Echo Multi* (macro) · Filter Pulse* · Electro Flyby*.
 - **Create your own:** Edit `qml/Settings/PadFXs.qml` → populate the blank PadFX slots (2.1–8.8) with a `name`, `color`, `routing`, three `effect` slots, and initial `drywet`/`knob`/`button` values. Use the supported color list, routing types, and effect names documented at the top of the file as the source of truth. Save and reload Traktor to pick up changes.

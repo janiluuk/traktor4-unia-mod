@@ -71,14 +71,6 @@ Module {
         WiresGroup {
             enabled: screenView.value == ScreenView.browser
 
-            //Navigation
-            /*
-            Wire { from: "%surface%.browse.push"; to: "screen.open_browser_node"; enabled: screenOverlay.value == Overlay.none } //this is also for loading Track to deck
-            Wire { from: "%surface%.back"; to: "screen.exit_browser_node" }
-            Wire { from: "%surface%.browse.turn"; to: "screen.scroll_browser_row"; enabled: !shift }
-            Wire { from: "%surface%.browse.turn"; to: "screen.scroll_browser_page"; enabled: shift }
-            */
-
             //Browser on touch
             Wire {
                 enabled: showBrowserOnTouch.value
@@ -129,8 +121,6 @@ Module {
                         WiresGroup {
                             enabled: shiftBrowsePush.value == 1
 
-                            //Wire { from: "%surface%.browse.push"; to: TriggerPropertyAdapter { path: "app.traktor.decks." + deckId + ".track.duplicate_deck." + leftFocusedDeckId.value } enabled: deckId == rightFocusedDeckId.value }
-                            //Wire { from: "%surface%.browse.push"; to: TriggerPropertyAdapter { path: "app.traktor.decks." + deckId + ".track.duplicate_deck." + rightFocusedDeckId.value } enabled: deckId == leftFocusedDeckId.value }
 
                             Wire { from: "%surface%.browse.push"; to: TriggerPropertyAdapter { path: "app.traktor.decks." + deckId + ".track.duplicate_deck.1" } enabled: deckId == rightFocusedDeckId.value && leftFocusedDeckId.value == 1 }
                             Wire { from: "%surface%.browse.push"; to: TriggerPropertyAdapter { path: "app.traktor.decks." + deckId + ".track.duplicate_deck.2" } enabled: deckId == rightFocusedDeckId.value && leftFocusedDeckId.value == 2 }
@@ -155,19 +145,7 @@ Module {
                         Wire { from: "%surface%.browse"; to: EncoderScriptAdapter { onIncrement: bpm.value = bpm.value + stepBpm.value; onDecrement: bpm.value = bpm.value - stepBpm.value } enabled: !shift && browseEncoder.value == 0 }
                         Wire { from: "%surface%.browse"; to: EncoderScriptAdapter { onIncrement: bpm.value = bpm.value + stepShiftBpm.value; onDecrement: bpm.value = bpm.value - stepShiftBpm.value } enabled: shift && shiftBrowseEncoder.value == 0 }
                         Wire { from: "%surface%.browse"; to: EncoderScriptAdapter { onIncrement: tempo.value = tempo.value + stepTempo.value; onDecrement: tempo.value = tempo.value - stepTempo.value } enabled: !shift && browseEncoder.value == 1 }
-                        Wire { from: "%surface%.browse"; to: EncoderScriptAdapter { onIncrement: tempo.value = tempo.value + stepShiftTempo.value; onDecrement: tempo.value = tempo.value - stepShiftTempo.value } enabled: shift && shiftBrowseEncoder.value == 1 }
-/*
-                        //Not working no idea why, the step .value isn't considered, it reads the default one
-                        Wire { from: "%surface%.browse"; to: RelativePropertyAdapter { path: "app.traktor.decks." + deckId + ".tempo.adjust_bpm"; step: stepBpm.value; mode: RelativeMode.Stepped } enabled: !shift && browseEncoder.value == 0 }
-                        Wire { from: "%surface%.browse"; to: RelativePropertyAdapter { path: "app.traktor.decks." + deckId + ".tempo.adjust_bpm"; step: stepShiftBpm.value; mode: RelativeMode.Stepped } enabled: shift && shiftBrowseEncoder.value == 0 }
-                        Wire { from: "%surface%.browse"; to: RelativePropertyAdapter { path: "app.traktor.decks." + deckId + ".tempo.absolute"; step: stepTempo.value; mode: RelativeMode.Stepped } enabled: !shift && browseEncoder.value == 1 }
-                        Wire { from: "%surface%.browse"; to: RelativePropertyAdapter { path: "app.traktor.decks." + deckId + ".tempo.absolute"; step: stepShiftTempo.value; mode: RelativeMode.Stepped } enabled: shift && shiftBrowseEncoder.value == 1 }
-*/
-/*
-                        Wire { from: "%surface%.back";   to: "tempo.reset"; enabled: browseEncoder.value == 0 || browseEncoder.value == 1 }
-                        Wire { from: "%surface%.browse"; to: "tempo.coarse"; enabled: (!shift && browseEncoder.value == 0) || (shift && shiftBrowseEncoder.value == 0) }
-                        Wire { from: "%surface%.browse"; to: "tempo.fine"; enabled: (!shift && browseEncoder.value == 1) || (shift && shiftBrowseEncoder.value == 1) }
-*/
+                    Wire { from: "%surface%.browse"; to: EncoderScriptAdapter { onIncrement: tempo.value = tempo.value + stepShiftTempo.value; onDecrement: tempo.value = tempo.value - stepShiftTempo.value } enabled: shift && shiftBrowseEncoder.value == 1 }
                     }
 
                     //Zoom
@@ -194,8 +172,6 @@ Module {
                         enabled: (((masterId.value+1) == deckId || isSyncEnabled.value == false) && fixBPMControl.value) || !fixBPMControl.value
                         Wire { from: "%surface%.browse"; to: EncoderScriptAdapter { onIncrement: bpm.value = bpm.value + stepBpm.value; onDecrement: bpm.value = bpm.value - stepBpm.value } enabled: !shift }
                         Wire { from: "%surface%.browse"; to: EncoderScriptAdapter { onIncrement: bpm.value = bpm.value + stepShiftBpm.value; onDecrement: bpm.value = bpm.value - stepShiftBpm.value } enabled: shift }
-                        //Wire { from: "%surface%.browse"; to: "tempo.coarse"; enabled: !shift }
-                        //Wire { from: "%surface%.browse"; to: "tempo.fine"; enabled: shift }
                         Wire { from: "%surface%.back"; to: "tempo.reset" }
                     }
                 }
@@ -206,7 +182,6 @@ Module {
                     Wire { from: "%surface%.browse.push"; to: TogglePropertyAdapter { path: "app.traktor.decks." + deckId + ".track.key.lock_enabled_preserve_pitch" } }
                     Wire { from: "%surface%.browse.turn"; to: RelativePropertyAdapter { path: "app.traktor.decks." + deckId + ".track.key.adjust"; step: 1/12; mode: RelativeMode.Stepped } enabled: !shift }
                     Wire { from: "%surface%.browse.turn"; to: RelativePropertyAdapter { path: "app.traktor.decks." + deckId + ".track.key.adjust"; step: 0.01/12; mode: RelativeMode.Stepped } enabled: shift }
-                    //Wire { from: "%surface%.back"; to: SetPropertyAdapter { path: "app.traktor.decks." + deckId + ".track.key.adjust"; value: 0 } } --> to push instead of hold back to reset
                     Wire { from: "%surface%.back"; to: "key_control.reset" }
                 }
 
@@ -226,18 +201,9 @@ Module {
                 WiresGroup {
                     enabled: screenOverlay.value == Overlay.hotcueType
 
-                    //Wire { from: "%surface%.browse.turn"; to: EncoderScriptAdapter { onIncrement: { selectedHotcueType.value ==5 ? selectedHotcueType.value = selectedHotcueType.value - 5 : selectedHotcueType.value = selectedHotcueType.value + 1 } onDecrement: { selectedHotcueType.value ==0 ? selectedHotcueType.value = selectedHotcueType.value + 5 : selectedHotcueType.value = selectedHotcueType.value -1 } } }
-                    //Wire { from: "%surface%.browse.turn"; to: RelativePropertyAdapter { path: "app.traktor.decks." + deckId + ".track.cue.hotcues." + selectedHotcue.value + ".type"; mode: RelativeMode.Stepped; step: 1 } }
                     Wire { from: "%surface%.back"; to: SetPropertyAdapter { path: selectedCuePath + ".type"; value: 0; output: false } }
                     Wire { from: "%surface%.back"; to: ButtonScriptAdapter { brightness: selectedHotcueType.value != 0 } }
 
-    /*
-                    //General Deck CueType
-                    Wire { from: "%surface%.browse.turn"; to: EncoderScriptAdapter { onIncrement: { cueType.value ==5 ? cueType.value = cueType.value - 5 : cueType.value = cueType.value + 1 } onDecrement: { cueType.value ==0 ? cueType.value = cueType.value + 5 : selectedHotcueType.value = selectedHotcueType.value -1 } } }
-                    //Wire { from: "%surface%.browse.turn"; to: RelativePropertyAdapter { path: "app.traktor.decks." + deckId + ".track.cue.type"; mode: RelativeMode.Stepped; step: 1 } }
-                    Wire { from: "%surface%.back"; to: SetPropertyAdapter { path: "app.traktor.decks." + deckId + ".track.cue.type"; value: 0; output: false } }
-                    Wire { from: "%surface%.back"; to: ButtonScriptAdapter { brightness: selectedHotcueType.value != 0 } }
-    */
                 }
 
                 //MixerFX Overlay
@@ -382,12 +348,6 @@ Module {
             WiresGroup {
                 enabled: deck.deckType == DeckType.Remix
 
-                //FooterPage Overlay
-/*
-                Wire { from: "%surface%.browse.touch"; to: SetPropertyAdapter { path: propertiesPath + ".top.footer_page";	value: FooterPage.volume } enabled: !footerFocus.value }
-                Wire { from: "%surface%.browse.push"; to: SetPropertyAdapter { path: propertiesPath + ".top.footer_page";	value: FooterPage.volume } enabled: !footerFocus.value }
-                Wire { from: "%surface%.browse.is_turned"; to: SetPropertyAdapter { path: propertiesPath + ".top.footer_page";	value: FooterPage.volume } enabled: !footerFocus.value }
-*/
 
                 //Volume
                 Wire { from: "%surface%.browse.turn"; to: RelativePropertyAdapter { path:"app.traktor.decks." + deckId + ".remix.players.1.volume"; step: 0.025; mode: RelativeMode.Stepped } enabled: slot1Selected.value  }
@@ -406,12 +366,6 @@ Module {
             WiresGroup {
                 enabled: deck.deckType == DeckType.Stem
 
-                //FooterPage Overlay
-/*
-                Wire { from: "%surface%.browse.touch"; to: SetPropertyAdapter { path: propertiesPath + ".top.footer_page";	value: FooterPage.volume } enabled: !footerFocus.value }
-                Wire { from: "%surface%.browse.push"; to: SetPropertyAdapter { path: propertiesPath + ".top.footer_page";	value: FooterPage.volume } enabled: !footerFocus.value }
-                Wire { from: "%surface%.browse.is_turned"; to: SetPropertyAdapter { path: propertiesPath + ".top.footer_page";	value: FooterPage.volume } enabled: !footerFocus.value }
-*/
 
                 //Volume
                 Wire { from: "%surface%.browse.turn"; to: RelativePropertyAdapter { path:"app.traktor.decks." + deckId + ".stems.1.volume"; step: 0.025; mode: RelativeMode.Stepped } enabled: slot1Selected.value  }
