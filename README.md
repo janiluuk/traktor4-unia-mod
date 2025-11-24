@@ -7,10 +7,11 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
 ## What’s inside
 
 ### Controller features (S5)
-- **Browse Encoder upgrades**  
+- **Browse Encoder upgrades**
   Turn = list navigation · **Shift+Turn** = cycle sort column · **Push** = load to focused deck · **Shift+Push** = pre-listen.
-- **Loop Encoder ergonomics**  
+- **Loop Encoder ergonomics**
   Turn = loop size step · **Push** = set in/out · **Shift** = fine step.
+  - In Browser Sorting mode, press the Loop Encoder to flip the sort direction (ascending/descending) while keeping your chosen column.
 - **Touch Strips, performance-first**
   Default = pitch bend · **Shift** = seek (fast, precise scrubbing).
 - **Cue drops without leaving the deck**
@@ -80,10 +81,10 @@ A refactored QML bundle for **Native Instruments Traktor Pro 4** that preserves 
 
 ## Controller behavior (S5 quick sheet)
 
-- **Browse Encoder**:  
-  Turn = navigate · **Shift+Turn** = sort column · **Push** = load · **Shift+Push** = pre-listen  
-- **Loop Encoder**:  
-  Turn = size · **Push** = loop in/out · **Shift** = fine step  
+- **Browse Encoder**:
+  Turn = navigate · **Shift+Turn** = sort column · **Push** = load · **Shift+Push** = pre-listen
+- **Loop Encoder**:
+  Turn = size · **Push** = loop in/out · **Shift** = fine step · **Browser Sorting mode**: press to invert sort direction
 - **Touch Strips**:
   Default = bend · **Shift** = seek
 - **Cue (Shift)**:
