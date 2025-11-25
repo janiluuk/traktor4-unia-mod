@@ -1,2 +1,7 @@
+# QML Module Definition for Traktor Pro 4 Controllers
+# This file helps Traktor locate and load S5 and S8 controller mappings
+# If Traktor doesn't recognize your controller after installation,
+# ensure this file is present in the CSI folder
+
 S5 1.0 S5/S5.qml
 S8 1.0 S8/S8.qml

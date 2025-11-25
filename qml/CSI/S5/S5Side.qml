@@ -6,7 +6,6 @@ import CSI 1.0
 import QtQuick 2.0
 
 import "../../Defines"
-import "../Common/LegacyControllers"
 import "../../Helpers/LED.js" as LED
 
 Module {
