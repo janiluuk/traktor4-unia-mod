@@ -1,69 +1,74 @@
 # Fixes Applied to Resolve Controller Recognition Issues
 
 ## Problem
-When users copied the mod files to Traktor's qml folder, the S5/S8 controller would no longer appear in Traktor Pro 4.
+When users copied the mod files to Traktor's qml folder, the S5/S8 controller would no longer appear in Traktor Pro 4.1, even after merging the folders correctly. The controller would stay silent with no S5/S8 selection available in Traktor.
 
-## Root Causes Identified
+## Root Cause Identified
 
-### 1. Incorrect Installation Method
-**Issue**: Users were replacing the entire qml folder instead of merging files.
+### Incorrect qmldir File in CSI Folder
 
-**Impact**: This deleted essential Traktor Pro 4 core files needed for:
-- Other controller support (D2, Z2, etc.)
-- Core CSI infrastructure
-- Traktor system modules
-
-**Fix**: Updated README.md with clear instructions to MERGE folders, not replace them.
-
-### 2. Missing qmldir File
-**Issue**: The CSI folder lacked a qmldir module definition file.
-
-**Impact**: While Traktor may not strictly require this for hardware-detected controllers, having it ensures proper module registration in the Qt QML system.
-
-**Fix**: Added `qml/CSI/qmldir` with controller registrations:
+**Issue**: The CSI folder contained a `qmldir` file that attempted to register S5 and S8 as QML types:
 ```
 S5 1.0 S5/S5.qml
 S8 1.0 S8/S8.qml
 ```
 
-### 3. Broken Import References
-**Issue**: Two files imported non-existent folders:
-- `S5Side.qml` imported `"../Common/LegacyControllers"`
-- `S5Deck.qml` imported `"../Common/LegacyControllers"` and `"../Common/PadsModes"`
+**Why this was wrong for Traktor Pro 4**:
+- In Traktor Pro 3.x, controller registration may have worked differently
+- In Traktor Pro 4, the CSI (Controller Scripting Interface) system is a native C++ plugin
+- Controllers are auto-discovered by Traktor's hardware detection system based on folder structure
+- The qmldir type registration interfered with Traktor Pro 4's controller discovery mechanism
+- Traktor Pro 4 expects to directly load CSI/S5/S5.qml and CSI/S8/S8.qml when hardware is detected
 
-**Impact**: These imports would fail if the referenced folders didn't exist in:
-- The mod repository (they don't)
-- The stock Traktor installation (if they existed there, replacing the CSI folder would delete them)
+**Impact**: 
+- The qmldir file caused Traktor Pro 4 to fail loading the controller mappings
+- Controllers would not appear in Traktor's controller selection
+- Hardware would be detected but the mapping would not load
 
-**Analysis**: These imports were unused in the code - no references to types from these modules were found.
+**Fix**: Removed the `qml/CSI/qmldir` file entirely. Traktor Pro 4 does not need or use qmldir for controller registration - it discovers controllers through the CSI folder structure convention.
 
-**Fix**: Removed the unused import statements from both files.
+## Additional Context
+
+### Previous Attempted Fixes (That Didn't Work)
+1. **Incorrect Installation Method**: Users were replacing folders instead of merging - README was updated with clearer instructions
+2. **Adding qmldir**: A qmldir was added to try to register controllers, but this actually caused the problem
+3. **Broken Import References**: Some imports to non-existent folders were removed (this was helpful but didn't solve the main issue)
+
+### Correct Directory Structure for Traktor Pro 4
+### Correct Directory Structure for Traktor Pro 4
+
+The mod should have this structure when merged with Traktor's existing qml folder:
+
+```
+qml/
+  CSI/
+    S5/
+      S5.qml                    # Main S5 controller mapping (auto-loaded by hardware detection)
+      S5Deck.qml
+      S5Side.qml
+      ... other S5 modules ...
+    S8/
+      S8.qml                    # Main S8 controller mapping (auto-loaded by hardware detection)
+      ... other S8 modules ...
+    Common/                     # Shared modules
+    (NO qmldir file in CSI/)    # Important: CSI should NOT have a qmldir for controller registration
+  Defines/
+    qmldir                      # Module definition for singleton types
+    ScreenView.qml
+    PadsMode.qml
+    ... other defines ...
+  Screens/
+  Helpers/
+  Settings/
+```
+
+**Key Point**: The CSI folder should NOT contain a qmldir file in Traktor Pro 4. Controllers are discovered by the native code through the folder naming convention (CSI/ControllerName/ControllerName.qml).
 
 ## Files Modified
 
-1. **README.md**
-   - Added warning about merging vs replacing
-   - Clarified installation steps with platform-specific paths
-   - Added Installation Verification section
-   - Added Troubleshooting section
+1. **qml/CSI/qmldir** (REMOVED)
+   - This file was incorrectly added and has been removed
+   - Traktor Pro 4 does not use qmldir for controller registration
 
-2. **qml/CSI/qmldir** (NEW)
-   - Added controller module registrations
-
-3. **qml/CSI/S5/S5Side.qml**
-   - Removed unused `import "../Common/LegacyControllers"`
-
-4. **qml/CSI/S5/S5Deck.qml**
-   - Removed unused `import "../Common/LegacyControllers"`
-   - Removed unused `import "../Common/PadsModes"`
-
-## Verification
-
-All relative imports have been validated to point to existing files/folders in the repository.
-
-## User Action Required
-
-Users who already installed the mod incorrectly should:
-1. Restore their backup of the original qml folder, OR
-2. Reinstall Traktor Pro 4 to restore original files
-3. Follow the updated installation instructions to MERGE files correctly
+2. **FIXES.md** (THIS FILE)
+   - Updated to reflect the correct fix for Traktor Pro 4 compatibility

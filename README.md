@@ -86,10 +86,13 @@ Rewritten UI which brings lot of new features, usability enhancements to S5 / S8
 ### Installation Verification
 
 After copying files, verify these key files exist:
-- `qml/CSI/qmldir` (should exist after installation)
 - `qml/CSI/S5/S5.qml` 
 - `qml/CSI/S8/S8.qml`
+- `qml/Defines/qmldir` (defines module)
 - Other CSI controller files that came with Traktor should remain intact
+
+**Important**: The `qml/CSI/` folder should NOT contain a `qmldir` file in Traktor Pro 4. If you see one, it should be removed.
+
 ### Troubleshooting: Controller Not Showing Up
 
 If your S5/S8 controller doesn't appear in Traktor after installation:
@@ -98,12 +101,16 @@ If your S5/S8 controller doesn't appear in Traktor after installation:
    - Restore your backup of the original qml folder
    - Follow the installation instructions above, making sure to MERGE folders
 
-2. **Verify the qmldir file exists**:
-   - Check that `qml/CSI/qmldir` exists in your Traktor installation
-   - This file is required for Traktor to recognize the S5 and S8 controllers
-   - The file should contain controller registrations
+2. **Remove any qmldir file from CSI folder**:
+   - Check if `qml/CSI/qmldir` exists in your Traktor installation
+   - If it does, DELETE it - this file interferes with Traktor Pro 4's controller discovery
+   - Traktor Pro 4 discovers controllers automatically through folder structure, not qmldir
 
-3. **Reinstall Traktor** (last resort):
+3. **Verify the folder structure**:
+   - Confirm `qml/CSI/S5/S5.qml` and `qml/CSI/S8/S8.qml` exist
+   - Confirm other Traktor controllers (D2, Z2, etc.) are still present in the CSI folder
+
+4. **Reinstall Traktor** (last resort):
    - If you don't have a backup and your controller still doesn't show up
    - Reinstall Traktor Pro 4 to restore the original files
    - Then follow the merge installation instructions correctly
