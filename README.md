@@ -1,4 +1,4 @@
-# Pro MOD for Traktor Pro 4.0+ with S5 / S8 controller
+# Traktor 4 - Unia MOD for S5 / S8 controllers
 
 ---
 Rewritten UI which brings lot of new features, usability enhancements to S5 / S8 controllers.
