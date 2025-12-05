@@ -58,7 +58,7 @@ This mod extends the native Traktor Pro 4 experience with quality-of-life improv
 
 ## Installation
 
-⚠️ **CRITICAL**: Merge files, don't replace folders!
+⚠️ **CRITICAL**: Merge files, do not replace folders!
 
 1. **Backup** Traktor's qml folder:
    - **macOS**: `/Applications/Traktor Pro 4.app/Contents/Resources/qml`
@@ -77,10 +77,10 @@ This mod extends the native Traktor Pro 4 experience with quality-of-life improv
 ### Troubleshooting
 
 **Controller not showing up?**
-- You likely replaced instead of merged folders
-- Restore backup and merge properly
-- Remove `qml/CSI/qmldir` if it exists (shouldn't be there)
-- Verify `qml/CSI/S5/S5.qml` and `qml/CSI/S8/S8.qml` exist
+- You likely replaced instead of merged folders.
+- Restore backup and merge properly.
+- Remove `qml/CSI/qmldir` if it exists (should not be there).
+- Verify `qml/CSI/S5/S5.qml` and `qml/CSI/S8/S8.qml` exist.
 
 ---
 
