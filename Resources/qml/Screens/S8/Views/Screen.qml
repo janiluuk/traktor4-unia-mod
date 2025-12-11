@@ -20,8 +20,9 @@ Item {
     id: screen
     property var flavor
     property bool isLeftScreen: true
-    property string settingsPath: isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
-    property string propertiesPath: isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+    property bool pathsProvided: false
+    property string settingsPath: ""
+    property string propertiesPath: ""
 
     width: 480
     height: 272
@@ -58,9 +59,30 @@ Item {
     Variables.Durations { id: durations }
     Variables.Margins { id: margins }
 
+    Component.onCompleted: {
+        // If paths were pre-set (e.g., by the host), respect them and derive side from them.
+        if (settingsPath !== "" || propertiesPath !== "") {
+            pathsProvided = true
+            if (settingsPath.indexOf(".right") !== -1 || propertiesPath.indexOf(".right") !== -1) {
+                isLeftScreen = false
+            }
+            if (settingsPath === "") {
+                settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
+            }
+            if (propertiesPath === "") {
+                propertiesPath = isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+            }
+        } else {
+            settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
+            propertiesPath = isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+        }
+    }
+
     onIsLeftScreenChanged: {
-        settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
-        propertiesPath = isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+        if (!pathsProvided) {
+            settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
+            propertiesPath = isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+        }
     }
 
 //------------------------------------------------------------------------------------------------------------------

@@ -19,9 +19,10 @@ import '../Shared/Widgets/' as Widgets
 Item {
     id: screen
     property var flavor
-    property bool isLeftScreen: true
-    property string settingsPath: isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
-    property string propertiesPath: isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+  property bool isLeftScreen: true
+  property bool pathsProvided: false
+  property string settingsPath: ""
+  property string propertiesPath: ""
 
     width: 320
     height: 240
@@ -60,10 +61,31 @@ Item {
     Variables.Durations { id: durations }
     Variables.Margins { id: margins }
 
-    onIsLeftScreenChanged: {
-        settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
-        propertiesPath = isLeftScreen ? "mapping.state.left" : "mapping.state.right"
-    }
+  Component.onCompleted: {
+      // If the host pre-sets paths, respect them and infer side from the suffix.
+      if (settingsPath !== "" || propertiesPath !== "") {
+          pathsProvided = true
+          if (settingsPath.indexOf(".right") !== -1 || propertiesPath.indexOf(".right") !== -1) {
+              isLeftScreen = false
+          }
+          if (settingsPath === "") {
+              settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
+          }
+          if (propertiesPath === "") {
+              propertiesPath = isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+          }
+      } else {
+          settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
+          propertiesPath = isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+      }
+  }
+
+  onIsLeftScreenChanged: {
+      if (!pathsProvided) {
+          settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
+          propertiesPath = isLeftScreen ? "mapping.state.left" : "mapping.state.right"
+      }
+  }
 
 //------------------------------------------------------------------------------------------------------------------
 // TRAKTOR SETTINGS
