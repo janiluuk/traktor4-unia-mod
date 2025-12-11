@@ -39,7 +39,7 @@ Item {
 
                 text: (hotcueColors.value != 0 ? letters[index] : (index+1)) + "."
                 color: type.value != -1 && exists.value && exists.value > 0 ? colors.colorGrey24 : colors.colorGrey128
-                font.family: "Pragmatica MediumTT"
+                font.family: "Pragmatica"
                 font.pixelSize: fonts.smallFontSize
                 verticalAlignment: Text.AlignVCenter
             }
@@ -57,7 +57,7 @@ Item {
 
                 text: (exists.value && exists.value > 0 && name.value != "n.n.") ? name.value : ""
                 color: exists.value && exists.value > 0 ? colors.colorGrey24 : colors.colorGrey128
-                font.family: "Pragmatica MediumTT"
+                font.family: "Pragmatica"
                 font.pixelSize: fonts.smallFontSize
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
@@ -72,7 +72,7 @@ Item {
 
                 text: (exists.value && exists.value > 0 && name.value != "n.n.") ? name.value : ""
                 color: exists.value && exists.value > 0 ? colors.colorGrey24 : colors.colorGrey128
-                font.family: "Pragmatica MediumTT"
+                font.family: "Pragmatica"
                 font.pixelSize: fonts.smallFontSize
                 elide: Text.ElideRight
                 horizontalAlignment: Text.AlignHCenter

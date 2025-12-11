@@ -13,7 +13,7 @@ Text {
   property double syncLabelOpacity
 
   readonly property string fontForNumber: "Pragmatica"
-  readonly property string fontForString: "Pragmatica MediumTT"
+  readonly property string fontForString: "Pragmatica"
 
   x: 0
   y: 0

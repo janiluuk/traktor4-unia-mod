@@ -10,6 +10,10 @@ Item {
 
   property bool remainingTime: displayRemainingTimeStripe.value
   property bool displayLetter: displayDeckLetterStripe.value
+  
+  //Deck letter (for S5/S8 compatibility - can be set by parent, or computed from deckId)
+  readonly property variant deckLetters: ["Clock", "A", "B", "C", "D"]
+  property string deckLetter: (deckId >= 0 && deckId < deckLetters.length) ? deckLetters[deckId] : "A"
 
   clip: true //prevents that children paints over zones which aren't inside the stripe (parent)
 

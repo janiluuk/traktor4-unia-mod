@@ -28,6 +28,93 @@ FullscreenOverlay {
   }
 
 //------------------------------------------------------------------------------------------------------------------
+// RECORDING STATUS (Main Menu)
+//------------------------------------------------------------------------------------------------------------------
+
+  AppProperty { id: mixRecorderRecording; path: "app.traktor.mix_recorder.recording" }
+  AppProperty { id: mixRecorderTime; path: "app.traktor.mix_recorder.recording_time" }
+  AppProperty { id: broadcastEnabled; path: "app.traktor.broadcast.enabled" }
+
+  function formatRecordingTime(ms) {
+    var totalMs = Number(ms);
+    if (isNaN(totalMs) || totalMs < 0) return "00:00";
+    var totalSeconds = Math.floor(totalMs / 1000);
+    var hours = Math.floor(totalSeconds / 3600);
+    var minutes = Math.floor((totalSeconds % 3600) / 60);
+    var seconds = totalSeconds % 60;
+    var minutesStr = (minutes < 10 ? "0" : "") + minutes;
+    var secondsStr = (seconds < 10 ? "0" : "") + seconds;
+    if (hours > 0) {
+      var hoursStr = (hours < 10 ? "0" : "") + hours;
+      return hoursStr + ":" + minutesStr + ":" + secondsStr;
+    }
+    return minutesStr + ":" + secondsStr;
+  }
+
+  // Recording Status Widget
+  Rectangle {
+    id: recordingWidget
+    anchors.top: parent.top
+    anchors.topMargin: 45
+    anchors.right: parent.right
+    anchors.rightMargin: 10
+    width: 180
+    height: 45
+    color: colors.colorGrey16
+    border.width: 1
+    border.color: mixRecorderRecording.value ? colors.cyan : colors.colorGrey32
+    visible: firstSettingsList.selectedIndex == 0
+    clip: true
+
+    Column {
+      anchors.left: parent.left
+      anchors.leftMargin: 8
+      anchors.verticalCenter: parent.verticalCenter
+      spacing: 2
+
+      Text {
+        font.pixelSize: 11
+        color: colors.colorFontFxHeader
+        text: "RECORDING"
+      }
+
+      Text {
+        font.pixelSize: 13
+        font.bold: true
+        color: mixRecorderRecording.value ? colors.cyan : colors.colorFontsListFx
+        text: mixRecorderRecording.value ? "ON" : "OFF"
+      }
+
+      Text {
+        font.pixelSize: 10
+        color: colors.colorFontsListFx
+        text: formatRecordingTime(mixRecorderTime.value)
+      }
+    }
+
+    // Toggle button indicator
+    Rectangle {
+      anchors.right: parent.right
+      anchors.rightMargin: 6
+      anchors.verticalCenter: parent.verticalCenter
+      width: 55
+      height: 28
+      color: mixRecorderRecording.value ? colors.cyan : colors.colorGrey32
+      border.width: 1
+      border.color: colors.colorGrey64
+
+      Text {
+        anchors.centerIn: parent
+        font.pixelSize: 10
+        font.bold: true
+        color: mixRecorderRecording.value ? "black" : colors.colorWhite
+        text: mixRecorderRecording.value ? "STOP" : "START"
+      }
+    }
+  }
+
+
+//------------------------------------------------------------------------------------------------------------------
 // SETTINGS
 //------------------------------------------------------------------------------------------------------------------
 
@@ -334,7 +421,13 @@ FullscreenOverlay {
 
   MappingProperty { id: settingsPush; path: propertiesPath + ".preferencesPush";
     onValueChanged: {
-        if (firstSettingsList.selectedIndex == 0) {firstSettingsList.selectedIndex = firstSettingsList.currentIndex+1; backBright.value = true}
+        if (firstSettingsList.selectedIndex == 0 && settingsPush.value) {
+            // Toggle recording when push button is pressed on main menu
+            mixRecorderRecording.value = !mixRecorderRecording.value
+            // Also allow normal navigation
+            firstSettingsList.selectedIndex = firstSettingsList.currentIndex+1; backBright.value = true
+        }
+        else if (firstSettingsList.selectedIndex == 0) {firstSettingsList.selectedIndex = firstSettingsList.currentIndex+1; backBright.value = true}
         else if (secondSettingsList.selectedIndex == 0) secondSettingsList.selectedIndex = secondSettingsList.currentIndex+1;
         else if (thirdSettingsList.selectedIndex == 0) {thirdSettingsList.selectedIndex = thirdSettingsList.currentIndex+1; settingsGrid.updateSettings(firstSettingsList.selectedIndex, secondSettingsList.selectedIndex, thirdSettingsList.selectedIndex, 0, 0)}
         else {

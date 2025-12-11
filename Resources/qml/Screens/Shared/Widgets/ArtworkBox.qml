@@ -11,6 +11,11 @@ StackLayout {
 
   property int albumBorderWidth: 1
   property color albumBorderColor: colors.colorWhite16
+  
+  //Deck properties (for S5/S8 compatibility - can be set by parent, or computed from deckId)
+  property int deckId: 1
+  readonly property variant deckLetters: ["Clock", "A", "B", "C", "D"]
+  property string deckLetter: (deckId >= 0 && deckId < deckLetters.length) ? deckLetters[deckId] : "A"
 
 //--------------------------------------------------------------------------------------------------------------------
 // Cover Art

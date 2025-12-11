@@ -308,7 +308,7 @@ Item {
     visible: isLoaded.value && deckSize != "small"
 
     text: mixerFXLabels[mixerFX.value]
-    font.family: "Pragmatica MediumTT"
+    font.family: "Pragmatica"
     font.pixelSize: fonts.smallFontSize + 1
     horizontalAlignment: Text.AlignRight
     //verticalAlignment: Text.AlignVCenter

@@ -138,7 +138,7 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
 
     text: mixerFXLabels[mixerFX.value]
-    font.family: "Pragmatica MediumTT"
+    font.family: "Pragmatica"
     font.pixelSize: fonts.scale(fxSize-1)
     horizontalAlignment: Text.AlignRight
     verticalAlignment: Text.AlignVCenter

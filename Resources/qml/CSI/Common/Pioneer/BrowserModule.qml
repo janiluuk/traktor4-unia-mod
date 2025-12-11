@@ -13,12 +13,14 @@ Module {
     readonly property int treeMode:           1
     // ------------------------------------
 
+    readonly property string deckPropertiesPath: "mapping.state.deck." + deckId
+
     MappingPropertyDescriptor {
       id: browseEnabled
       path: deckPropertiesPath + ".browse_enabled"
       type: MappingPropertyDescriptor.Boolean
     }
-    Wire { from: "surface.info_enable"; to:  DirectPropertyAdapter{ path: deckPropertiesPath + ".browse_enabled" } }
+    Wire { from: "surface.info_enable"; to:  DirectPropertyAdapter{ path: deckPropertiesPath + ".browse_enabled" }; enabled: active }
 
     MappingPropertyDescriptor
     {
@@ -44,10 +46,6 @@ Module {
     }
     Wire { enabled: active; from: "browser_info.tree_selection_has_entries"; to: DirectPropertyAdapter { path: deckPropertiesPath + ".tree_selection_has_entries" } }
 
-    Browser {
-        name: "browser"
-    }
-
     //XDJBrowserView { name: "browser_info"; channel: deckId; lines: module.lines; useHeader: module.useHeader } //3.4.2
     PioneerBrowser { name: "browser_info"; channel: deckId; lines: module.lines; useHeader: module.useHeader } //3.5+
     WiresGroup {
@@ -65,8 +63,8 @@ Module {
         // list mode
         WiresGroup {
             enabled: browserView.value == module.listMode;
-            Wire { from: "surface.tag_track";  to: "browser.add_remove_from_prep_list" }
-            Wire { from: "surface.browse"; to: "browser.list_navigation" }
+            Wire { from: "surface.tag_track";  to: "browser_info.tag_track" }
+            Wire { from: "surface.browse"; to: "browser_info.navigation" }
 
             Wire {
                 from: "surface.browse.push";
@@ -81,7 +79,7 @@ Module {
         // tree mode
         WiresGroup {
             enabled: browserView.value == module.treeMode;
-            Wire { from: "surface.browse"; to: "browser.tree_navigation" }
+            Wire { from: "surface.browse"; to: "browser_info.navigation" }
 
             Wire {
                 from: "surface.browse.push";
@@ -112,10 +110,7 @@ Module {
     Wire
     {
         from: "surface.back";
-        to: ButtonScriptAdapter
-        {
-            onPress: browserView.value = module.treeMode
-        }
-        enabled: active
+        to: "browser_info.back"
+        enabled: browseEnabled.value && active
     }
 }

@@ -16,6 +16,8 @@ Item {
   property color  deckColor: colors.colorBgEmpty
   readonly property variant textColors: [colors.brightBlue, colors.brightBlue, colors.colorGrey232, colors.colorGrey232]
   readonly property int speed: 40  // Transition speed
+  readonly property variant deckLetters: ["Clock", "A", "B", "C", "D"]
+  property string deckLetter: deckLetters[deckId]
 
 //--------------------------------------------------------------------------------------------------------------------
 // DECK HEADER CONTAINER

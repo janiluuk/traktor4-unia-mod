@@ -9,7 +9,11 @@ FullscreenOverlay {
     anchors.fill: parent
     //onVisibleChanged: { body.updateFxSelection() }
 
-    property int unit: fxSettingsTab.value <= 4 ? topFXUnit.value : bottomFXUnit.value
+    property string propertiesPath: ""
+    property var topFXUnit: null
+    property var bottomFXUnit: null
+
+    property int unit: fxSettingsTab.value <= 4 ? (topFXUnit ? topFXUnit.value : 1) : (bottomFXUnit ? bottomFXUnit.value : 1)
     property int activeTab: (fxSettingsTab.value-1) % 4 //-1 to "fix the 4 % 4 = 0 issue". Otherwise, on Group FX units, when the active tab is the third FX, it wouldn't be detected
     property color fxUnitColor: fxType.value != FxType.PatternPlayer ? colors.orange : colors.fxPatternPlayer
 
@@ -43,6 +47,15 @@ FullscreenOverlay {
         id: body
         unit: parent.unit
         activeTab: parent.activeTab
+        propertiesPath: propertiesPath
+        fxSettingsTab: fxSettingsTab
+        topFXUnit: topFXUnit
+        bottomFXUnit: bottomFXUnit
+        fxMode: fxMode
+        fxType: fxType
+        fxRouting: fxRouting
+        fxSnapshotStore: fxSnapshotStore
+        fxSnapshotLoad: fxSnapshotLoad
     }
 
     function updateActiveTab() {

@@ -6,8 +6,19 @@ import "../../../../Helpers/Utils.js" as Utils
 
 Item {
     id: fxSelectBody
-    property int unit
-    property int activeTab
+    property int unit: 1  // default to 1 to prevent invalid paths
+    property int activeTab: 0  // default to 0 to prevent invalid paths
+    
+    // Properties that should be passed from parent
+    property string propertiesPath: "mapping.state"
+    property var fxSettingsTab
+    property var topFXUnit
+    property var bottomFXUnit
+    property var fxMode
+    property var fxType
+    property var fxRouting
+    property var fxSnapshotStore
+    property var fxSnapshotLoad
 
     anchors.fill: parent
     anchors.margins: 5
@@ -20,23 +31,35 @@ Item {
     readonly property int macroEffectChar: 0x00B6
 
     AppProperty { id: patternPlayerEnabled; path: "app.traktor.settings.pro.plus.pattern_player" }
-    AppProperty { id: fxSelectList; path: "app.traktor.fx." + unit + ".select." + activeTab
+    
+    // Only create AppProperty path when unit and activeTab are valid (>= 1 for unit, >= 0 for activeTab)
+    property string fxSelectListPath: (unit >= 1 && activeTab >= 0) ? ("app.traktor.fx." + unit + ".select." + Math.max(1, activeTab)) : ""
+    AppProperty { 
+        id: fxSelectList
+        path: fxSelectListPath
         onValueChanged: {
-            fxList.currentIndex = fxSelectList.value //BUG: the first time that the fxSelectList value changes (from undefined to value), it doesn't work.
+            if (fxList && fxSelectList.value !== undefined && fxSelectList.value >= 0) {
+                fxList.currentIndex = fxSelectList.value
+            }
         }
     }
-    property var fxUnit: fxSettingsTab.value <= 4 ? topFXUnit : bottomFXUnit
+    property var fxUnit: (fxSettingsTab && fxSettingsTab.value) ? (fxSettingsTab.value <= 4 ? (topFXUnit ? topFXUnit : null) : (bottomFXUnit ? bottomFXUnit : null)) : null
 
     //FX Settings View
     Item {
         id: fxSettings
-        property int currentIndex: computeIndex(buttons.filter(button => button.box && !button.hide).sort((a,b) => a.column - b.column || a.row - b.row)[0], 3)
+        function getInitialIndex() {
+            if (!buttons || buttons.length === 0) return 0;
+            const filtered = buttons.filter(button => button.box && !button.hide).sort((a,b) => a.column - b.column || a.row - b.row);
+            return filtered.length > 0 ? computeIndex(filtered[0], 3) : 0;
+        }
+        property int currentIndex: getInitialIndex()
 
         readonly property variant buttons: [
             ({
                 column: 1,
                 row: 1,
-                text: fxSettingsTab.value <= 4 ? "Top FX Unit" : "Bottom FX Unit",
+                text: (fxSettingsTab && fxSettingsTab.value) ? (fxSettingsTab.value <= 4 ? "Top FX Unit" : "Bottom FX Unit") : "FX Unit",
             }),
             ({
                 column: 1,
@@ -45,7 +68,7 @@ Item {
                 description: "",
                 box: true,
                 radio: true,
-                active: fxUnit.value == 1,
+                active: (fxUnit && fxUnit.value) == 1,
                 action: () => { fxUnit.value = 1 }
             }),
             ({
@@ -55,7 +78,7 @@ Item {
                 description: "",
                 box: true,
                 radio: true,
-                active: fxUnit.value == 2,
+                active: (fxUnit && fxUnit.value) == 2,
                 action: () => { fxUnit.value = 2 }
             }),
             ({
@@ -65,8 +88,8 @@ Item {
                 description: "",
                 box: true,
                 radio: true,
-                active: fxUnit.value == 3,
-                action: () => { if (fxMode.value == FxMode.FourFxUnits) fxUnit.value = 3 }
+                active: (fxUnit && fxUnit.value) == 3,
+                action: () => { if (fxMode && fxMode.value == FxMode.FourFxUnits && fxUnit) fxUnit.value = 3 }
             }),
             ({
                 column: 1,
@@ -75,8 +98,8 @@ Item {
                 description: "",
                 box: true,
                 radio: true,
-                active: fxUnit.value == 4,
-                action: () => { if (fxMode.value == FxMode.FourFxUnits) fxUnit.value = 4 }
+                active: (fxUnit && fxUnit.value) == 4,
+                action: () => { if (fxMode && fxMode.value == FxMode.FourFxUnits && fxUnit) fxUnit.value = 4 }
             }),
             ({
                 column: 1,
@@ -85,9 +108,9 @@ Item {
                 description: "",
                 box: true,
                 radio: true,
-                active: fxUnit.value == 0,
-                action: () => { fxUnit.value = 0 },
-                hide: (fxSettingsTab.value <= 4)
+                active: (fxUnit && fxUnit.value) == 0,
+                action: () => { if (fxUnit) fxUnit.value = 0 },
+                hide: (fxSettingsTab && fxSettingsTab.value) ? (fxSettingsTab.value <= 4) : false
             }),
             ({
                 column: 2,
@@ -101,7 +124,7 @@ Item {
                 description: "Set FX Unit as a Single Effect Unit",
                 box: true,
                 radio: true,
-                active: fxType.value == FxType.Single,
+                active: (fxType && fxType.value) == FxType.Single,
                 action: () => { fxType.value = FxType.Single }
             }),
             ({
@@ -111,7 +134,7 @@ Item {
                 description: "Set FX Unit as a Group Effect Unit",
                 box: true,
                 radio: true,
-                active: fxType.value == FxType.Group,
+                active: (fxType && fxType.value) == FxType.Group,
                 action: () => { fxType.value = FxType.Group }
             }),
             ({
@@ -121,7 +144,7 @@ Item {
                 description: "Set FX Unit as a Pattern Player Unit",
                 box: true,
                 radio: true,
-                active: fxType.value == FxType.PatternPlayer,
+                active: (fxType && fxType.value) == FxType.PatternPlayer,
                 action: () => { fxType.value = FxType.PatternPlayer }
             }),
             ({
@@ -136,7 +159,7 @@ Item {
                 description: "Only 2 FX Units will be visible (all 4 are usable with HW)",
                 box: true,
                 radio: true,
-                active: fxMode.value == FxMode.TwoFxUnits,
+                active: (fxMode && fxMode.value) == FxMode.TwoFxUnits,
                 action: () => { fxMode.value = FxMode.TwoFxUnits }
             }),
             ({
@@ -146,7 +169,7 @@ Item {
                 description: "All 4 FX Units will be visible (and usable with HW)",
                 box: true,
                 radio: true,
-                active: fxMode.value == FxMode.FourFxUnits,
+                active: (fxMode && fxMode.value) == FxMode.FourFxUnits,
                 action: () => { fxMode.value = FxMode.FourFxUnits }
             }),
             ({
@@ -161,7 +184,7 @@ Item {
                 description: "Applied to the input signal of the channel",
                 box: true,
                 radio: true,
-                active: fxRouting.value == FxRouting.Insert,
+                active: (fxRouting && fxRouting.value) == FxRouting.Insert,
                 action: () => { fxRouting.value = FxRouting.Insert }
             }),
             ({
@@ -171,7 +194,7 @@ Item {
                 description: "Applied to the output signal of the channel",
                 box: true,
                 radio: true,
-                active: fxRouting.value == FxRouting.PostFader,
+                active: (fxRouting && fxRouting.value) == FxRouting.PostFader,
                 action: () => { fxRouting.value = FxRouting.PostFader }
             }),
             ({
@@ -181,7 +204,7 @@ Item {
                 description: "For external mixing only!",
                 box: true,
                 radio: true,
-                active: fxRouting.value == FxRouting.Send,
+                active: (fxRouting && fxRouting.value) == FxRouting.Send,
                 action: () => { fxRouting.value = FxRouting.Send }
             }),
             ({
@@ -196,7 +219,7 @@ Item {
                 description: "Take a snapshot of the current state of the unit",
                 box: true,
                 radio: false,
-                active: fxSnapshotStore.value == true,
+                active: (fxSnapshotStore && fxSnapshotStore.value) == true,
                 action: () => { fxSnapshotStore.value = true }
             }),
             ({
@@ -206,13 +229,13 @@ Item {
                 description: "Load a snapshot of a previously saved state of the unit",
                 box: true,
                 radio: false,
-                active: fxSnapshotLoad.value == true,
+                active: (fxSnapshotLoad && fxSnapshotLoad.value) == true,
                 action: () => { fxSnapshotLoad.value = true }
             }),
         ]
 
         anchors.fill: parent
-        visible: activeTab == 0 //&& fxSettingsTab.value <= 4
+        visible: activeTab == 0
 
         Grid {
             id: grid
@@ -300,7 +323,7 @@ Item {
         visible: activeTab != 0
         model: fxType.value != FxType.PatternPlayer ? fxSelectList.valuesDescription : patterPlayer.valuesDescription
         */
-        visible: activeTab != 0 && fxType.value != FxType.PatternPlayer
+        visible: activeTab != 0 && (fxType && fxType.value != FxType.PatternPlayer)
         model: fxSelectList.valuesDescription
 
         delegate:
@@ -379,28 +402,28 @@ Item {
                     return fxSettings.buttons[fxSettings.currentIndex].action
                 }
                 */
-                if (fxSettings.currentIndex == 3) fxUnit.value = 1
-                else if (fxSettings.currentIndex == 6) fxUnit.value = 2
-                else if (fxSettings.currentIndex == 9 && fxMode.value == FxMode.FourFxUnits) fxUnit.value = 3
-                else if (fxSettings.currentIndex == 12 && fxMode.value == FxMode.FourFxUnits) fxUnit.value = 4
-                else if (fxSettings.currentIndex == 15 && fxSettingsTab.value > 4) fxUnit.value = 0
+                if (fxSettings.currentIndex == 3 && fxUnit) fxUnit.value = 1
+                else if (fxSettings.currentIndex == 6 && fxUnit) fxUnit.value = 2
+                else if (fxSettings.currentIndex == 9 && fxMode && fxMode.value == FxMode.FourFxUnits && fxUnit) fxUnit.value = 3
+                else if (fxSettings.currentIndex == 12 && fxMode && fxMode.value == FxMode.FourFxUnits && fxUnit) fxUnit.value = 4
+                else if (fxSettings.currentIndex == 15 && fxSettingsTab && fxSettingsTab.value > 4 && fxUnit) fxUnit.value = 0
 
-                else if (fxSettings.currentIndex == 4) fxType.value = FxType.Single
-                else if (fxSettings.currentIndex == 7) fxType.value = FxType.Group
-                else if (fxSettings.currentIndex == 10 && patternPlayerEnabled.value) fxType.value = FxType.PatternPlayer
+                else if (fxSettings.currentIndex == 4 && fxType) fxType.value = FxType.Single
+                else if (fxSettings.currentIndex == 7 && fxType) fxType.value = FxType.Group
+                else if (fxSettings.currentIndex == 10 && patternPlayerEnabled.value && fxType) fxType.value = FxType.PatternPlayer
 
-                else if (fxSettings.currentIndex == 16) fxMode.value = FxMode.TwoFxUnits
-                else if (fxSettings.currentIndex == 19) fxMode.value = FxMode.FourFxUnits
+                else if (fxSettings.currentIndex == 16 && fxMode) fxMode.value = FxMode.TwoFxUnits
+                else if (fxSettings.currentIndex == 19 && fxMode) fxMode.value = FxMode.FourFxUnits
 
-                else if (fxSettings.currentIndex == 5) fxRouting.value = FxRouting.Insert
-                else if (fxSettings.currentIndex == 8) fxRouting.value = FxRouting.PostFader
-                else if (fxSettings.currentIndex == 11) fxRouting.value = FxRouting.Send
+                else if (fxSettings.currentIndex == 5 && fxRouting) fxRouting.value = FxRouting.Insert
+                else if (fxSettings.currentIndex == 8 && fxRouting) fxRouting.value = FxRouting.PostFader
+                else if (fxSettings.currentIndex == 11 && fxRouting) fxRouting.value = FxRouting.Send
 
-                else if (fxSettings.currentIndex == 17) fxSnapshotStore.value = true
-                else if (fxSettings.currentIndex == 20) fxSnapshotLoad.value = true
+                else if (fxSettings.currentIndex == 17 && fxSnapshotStore) fxSnapshotStore.value = true
+                else if (fxSettings.currentIndex == 20 && fxSnapshotLoad) fxSnapshotLoad.value = true
             }
             else {
-                if (fxType.value != FxType.PatternPlayer) fxSelectList.value = fxList.currentIndex
+                if (fxType && fxType.value != FxType.PatternPlayer && fxSelectList) fxSelectList.value = fxList.currentIndex
                 // TODO TP-17057 we prevent fx selection if pattern player is selected...
                 // INFO: Awaiting for the Traktor team to support Pattern Player kit selection...
                 //else
@@ -433,16 +456,22 @@ Item {
         const row = Math.trunc(current / columns)
 
         const boxes = buttons.filter(button => button.box && !button.hide).sort((a,b) => a.column - b.column || a.row - b.row)
+        if (boxes.length === 0) return 0;
+        
         const min = 0 //calculateIndex(boxes[0], columns)
         const max = boxes.length - 1 //calculateIndex(boxes[-1], columns)
 
-        const active = Utils.clamp(boxes.findIndex(button => button.column == column+1 && button.row == row+1), min, max)
+        let active = boxes.findIndex(button => button.column == column+1 && button.row == row+1)
+        if (active < 0) active = 0; // fallback if not found
+        active = Utils.clamp(active, min, max)
         let next = active + delta // < min || active + delta +1 > boxes.length ? (active+delta) % boxes.length : active+delta;
         next = next < min ? max - (-next-1 + min) : next > max ? min + (next-1 - max) : next;
+        next = Utils.clamp(next, min, max); // ensure next is in bounds
         return computeIndex(boxes[next], columns)
     }
 
     function computeIndex(box, columns){
+        if (!box) return 0; // safety check
         return (box.row-1)*columns + box.column - 1
     }
 

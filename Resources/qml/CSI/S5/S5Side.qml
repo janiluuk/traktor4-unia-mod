@@ -7,14 +7,22 @@ import "../../Helpers/LED.js" as LED
 
 Module {
     id: side
-    property int topDeckId: 1
-    property int bottomDeckId: 3
+    property int topDeckId: 1  // Set by parent (S5.qml)
+    property int bottomDeckId: 3  // Set by parent (S5.qml)
     property string surface: "hw.side"
     property string settingsPath: "mapping.settings.left"
     property string propertiesPath: "mapping.state.left"
     property bool shift: false
+    property bool onlyFocusedDeck: false  // Set by parent (S5.qml)
+    readonly property real bright: 1.0
 
     property alias screenView: screenView.value //necessary for the cross-display interaction
+
+    //Master clock
+    AppProperty { id: masterId; path: "app.traktor.masterclock.source_id" } //-1: MasterClock, 0: Deck A, 1: Deck B, 2: Deck C, 3: Deck D
+    
+    //Hold timer (shared setting from parent)
+    MappingProperty { id: holdTimer; path: "mapping.settings.holdTimer" }
 
 //------------------------------------------------------------------------------------------------------------------
 // PREFERENCES PROPERTIES
@@ -276,10 +284,20 @@ Module {
         }
     }
 
-    //Browser navigation
+    //Browser navigation - use explicit load command to ensure correct deck
+    AppProperty { id: loadSelected; path: "app.traktor.decks." + focusedDeckId + ".load.selected" }
+    MappingProperty { id: browserEnterNode; path: propertiesPath + ".browserEnterNode" }
+    
     WiresGroup {
         enabled: screenView.value == ScreenView.browser
-        Wire { from: "%surface%.browse.push"; to: "screen.open_browser_node"; enabled: screenOverlay.value == Overlay.none } //this is also for loading Track to deck
+        Wire { from: "%surface%.browse.push"; to: ButtonScriptAdapter { 
+            onPress: { 
+                // Set browser enter node for navigation
+                browserEnterNode.value = true;
+                // Explicitly load to the focused deck for this side (ensures correct deck)
+                loadSelected.value = true;
+            }
+        } enabled: screenOverlay.value == Overlay.none }
         Wire { from: "%surface%.back"; to: "screen.exit_browser_node" }
         Wire { from: "%surface%.browse.turn"; to: "screen.scroll_browser_row"; enabled: !shift }
         Wire { from: "%surface%.browse.turn"; to: "screen.scroll_browser_page"; enabled: shift }

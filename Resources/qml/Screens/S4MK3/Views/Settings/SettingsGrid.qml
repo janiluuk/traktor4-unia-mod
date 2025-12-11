@@ -1131,10 +1131,10 @@ Item {
         }
         else if (secondIndex == 2) { //Mix Recorder
             if (thirdIndex == 1) {
-                mixRecorderRecording.value = currentIndex == 1
+                mixRecorderRecording.value = !mixRecorderRecording.value
             }
             else if (thirdIndex == 2) {
-                broadcastEnabled.value = currentIndex == 1
+                broadcastEnabled.value = !broadcastEnabled.value
             }
         }
     }

@@ -14,7 +14,7 @@ Item {
   property int	  containerRadius:	0
   property string   marqueeText:	  ""
   property int	  textTopMargin:	0
-  property string   textFontFamily:   "Pragmatica MediumTT"
+  property string   textFontFamily:   "Pragmatica"
   property int	  textFontSize:	 20
   property bool	 textFontBold:	 false
   property bool	 textFontItalic:   false

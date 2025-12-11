@@ -22,7 +22,7 @@ Rectangle {
     text: loopSize.value < 5 ? "1" + loopSize.description : loopSize.description
     color: isInActiveLoop.value ? (fluxIndicator && fluxing ? colors.orange : colors.green) : colors.colorGrey72
     font.pixelSize: fonts.scale((parent.height-parent.border.width*2) * (loopSize.value < 5 ? 0.45 : loopSize.value > 8 ? 0.6 : 0.65))
-    font.family: "Pragmatica MediumTT"
+    font.family: "Pragmatica"
     anchors.fill: parent
     anchors.rightMargin: 1
     anchors.topMargin: 1

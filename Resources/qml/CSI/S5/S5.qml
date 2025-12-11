@@ -273,6 +273,7 @@ Mapping {
         settingsPath: "mapping.settings.left"
         propertiesPath: "mapping.state.left"
         shift: (globalShift.value && globalShiftEnabled.value) || (leftShift.value && !globalShiftEnabled.value)
+        onlyFocusedDeck: onlyFocusedDeck.value
     }
 
     S5Side {
@@ -284,6 +285,7 @@ Mapping {
         settingsPath: "mapping.settings.right"
         propertiesPath: "mapping.state.right"
         shift: (globalShift.value && globalShiftEnabled.value) || (rightShift.value && !globalShiftEnabled.value)
+        onlyFocusedDeck: onlyFocusedDeck.value
     }
 
     SettingsLoader {
@@ -307,7 +309,7 @@ Mapping {
     MappingPropertyDescriptor { id: leftFocusedDeckId; path: "mapping.state.leftFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: left.focusedDeckId }
     MappingPropertyDescriptor { id: rightFocusedDeckId; path: "mapping.state.rightFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: right.focusedDeckId }
 
-    //Keep focused deck ids in sync with the current layer
+    //Keep focused deck ids aligned with the currently active layer
     Binding { target: leftFocusedDeckId; property: "value"; value: left.focusedDeckId }
     Binding { target: rightFocusedDeckId; property: "value"; value: right.focusedDeckId }
 

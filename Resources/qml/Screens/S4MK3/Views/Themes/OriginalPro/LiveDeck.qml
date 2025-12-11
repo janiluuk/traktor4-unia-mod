@@ -26,6 +26,8 @@ Item {
   property color deckColor: colors.colorBgEmpty
   readonly property variant textColors: [colors.brightBlue, colors.brightBlue, colors.colorGrey232, colors.colorGrey232]
   readonly property int speed: 40  // Transition speed
+  readonly property variant deckLetters: ["Clock", "A", "B", "C", "D"]
+  property string deckLetter: deckLetters[deckId]
 
 //--------------------------------------------------------------------------------------------------------------------
 // DECK HEADER CONTAINER
@@ -204,7 +206,7 @@ Item {
     color: mixerFXOn.value ? colors.mixerFXColors[mixerFX.value] : colors.colorGrey72
 
     text: mixerFXLabels[mixerFX.value]
-    font.family: "Pragmatica MediumTT"
+    font.family: "Pragmatica"
     font.pixelSize: fonts.smallFontSize + 1
     horizontalAlignment: Text.AlignRight
     verticalAlignment: Text.AlignVCenter

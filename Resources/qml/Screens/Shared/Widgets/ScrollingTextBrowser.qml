@@ -10,7 +10,7 @@ Item {
 
   property string textString: ""
   property color textColor: "black"
-  property string textFontFamily:   "Pragmatica MediumTT"
+  property string textFontFamily:   "Pragmatica"
   property int textFontSize: 20
   property bool textFontBold: false
   property bool textFontItalic: false
