@@ -181,7 +181,7 @@ Module {
         onRelease: {
             if (holdDeck_countdown.running) {
                 if (shift && screenView.value == ScreenView.deck) screenView.value = ScreenView.fxSettings
-                else if (screenView.value == ScreenView.fxSettings) screenView.value == ScreenView.deck
+                else if (screenView.value == ScreenView.fxSettings) screenView.value = ScreenView.deck
                 else topDeckFocused.value = !topDeckFocused.value
             }
             holdDeck_countdown.stop()

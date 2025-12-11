@@ -307,6 +307,10 @@ Mapping {
     MappingPropertyDescriptor { id: leftFocusedDeckId; path: "mapping.state.leftFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: left.focusedDeckId }
     MappingPropertyDescriptor { id: rightFocusedDeckId; path: "mapping.state.rightFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: right.focusedDeckId }
 
+    //Keep focused deck ids in sync with the current layer
+    Binding { target: leftFocusedDeckId; property: "value"; value: left.focusedDeckId }
+    Binding { target: rightFocusedDeckId; property: "value"; value: right.focusedDeckId }
+
     property bool leftScreenViewValue: left.screenView
     property bool rightScreenViewValue: right.screenView
 
