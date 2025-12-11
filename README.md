@@ -47,8 +47,6 @@ It extends Native Instruments’ CSI/QML layer with richer screens, deeper pad m
 ### 🎮 Supported Hardware
 - **Native Instruments**: S4 MK3, S5, S8, S2 MK3, S3, D2
 - **Pioneer DJ**: CDJ-3000, XDJ-700, XDJ-1000MK2 (via CSI)
----
-
 
 ---
 
