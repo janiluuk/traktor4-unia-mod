@@ -6,11 +6,13 @@ UNIA MOD is an advanced controller and screen mod for **Traktor Pro 4**
 
 It extends Native Instruments’ CSI/QML layer with richer screens, deeper pad modes, and smarter overlays for the supported controllers, without requiring custom mappings or weird MIDI hacks.
 
+**The core idea**: Control your entire DJ workflow directly from your controller—**no laptop interaction needed**. Advanced controls that are complex in the native version become simple and accessible right on your device.
+
 
 ## 🎯 Key Features at a Glance
 
 ### 📱 Enhanced Screens & Themes
-- **Multiple visual themes** for S4 MK3 and S8 (Original, OriginalPro, UNIA, CDJ-style layouts)
+- **Multiple visual themes** for S4 MK3, S5, and S8 (Original, OriginalPro, UNIA, CDJ-style layouts)
 - **Improved deck displays** with detailed BPM, key, pitch, loop, sync, and quantize info
 - **CDJ-inspired layouts** (CDJ2000NXS2, CDJ3000, Denon Prime styles)
 - **Customizable deck headers** with 34 different information fields
@@ -18,8 +20,9 @@ It extends Native Instruments’ CSI/QML layer with richer screens, deeper pad m
 ### 🎛️ Smart Overlays
 - **On-screen controls** for tempo, quantize, slice size, cue type, mixer FX, swing, and more
 - **Browser enhancements** with sorting, warnings, and load protection
-- **Context-aware displays** that reduce laptop dependency
+- **Context-aware displays** that eliminate laptop dependency—DJ with your laptop closed
 - **Configurable overlay timers** for each overlay type
+- **Simplified advanced controls**: Features that require diving into menus in native Traktor are now instantly accessible
 
 ### 🎹 Advanced Pad Modes
 - **Hotcues Mode** with extended banks and better feedback
@@ -66,12 +69,17 @@ It extends Native Instruments’ CSI/QML layer with richer screens, deeper pad m
 
 ### 1.1 Screen layouts & themes
 
-For **S4 MK3** and **S8** screens, UNIA MOD adds multiple visual “skins” and extra info layers:
+For **S4 MK3**, **S5**, and **S8** screens, UNIA MOD adds multiple visual “skins” and extra info layers:
 
 - **S4 MK3 themes**
   - `Original` – Close to NI’s stock layout, but enhanced.
   - `OriginalPro` – More detailed deck data and visual cues.
   - `UNIA` – Optimised for performance info and at-a-glance readability.
+
+- **S5 themes**
+  - Enhanced displays with improved deck info and overlays
+  - Optimized for standalone operation without laptop
+  - Full browser and settings access directly on the controller screens
 
 - **S8 themes**
   - `Traktor` – Enhanced stock-style screen.
@@ -85,13 +93,13 @@ Common features across themes:
 - Detailed deck info: BPM, key, pitch, loop, quantize, sync status, deck mode.
 - Waveform and remix/stems views with extra overlays.
 - Improved browser layouts and warnings (load protection, missing files, etc.).
-- Consistent overlays system shared between S4 MK3 and S8.
+- Consistent overlays system shared between S4 MK3, S5, and S8.
 
 ---
 
 ### 1.2 Overlays & quick controls
 
-UNIA MOD adds a rich overlay system for both S4 MK3 and S8:
+UNIA MOD adds a rich overlay system for S4 MK3, S5, and S8:
 
 **Center overlays** (on-screen popups):
 
@@ -180,7 +188,10 @@ What each device gets:
 - S4 MK3 / S8  
   → New screen themes, overlays, and pad engines.
 
-- S5 / S2 MK3 / S3 / D2  
+- **S5** (primary focus)  
+  → Enhanced screen displays, unified performance pads, improved transport/mixer logic, better deck handling, and simplified access to advanced controls—designed for laptop-free operation.
+
+- S2 MK3 / S3 / D2  
   → Unified performance pads, improved transport/mixer logic, and better deck handling.
 
 - CDJ / XDJ
@@ -226,7 +237,25 @@ UNIA MOD extends the default button behavior with many customizable combinations
 #### Browser & Navigation
 - Browse encoder works similar to S4 MK3 with configurable SHIFT modes
 
-### 2.3 Universal Shortcuts (All Controllers)
+### 2.3 S5 Button Combinations
+
+The **S5** is designed for laptop-free DJing with simplified access to advanced controls:
+
+#### Transport & Control
+- **PLAY/CUE/SYNC**: Same configurable SHIFT combinations as S4 MK3
+- **Browse Encoder**: Full library navigation and configurable SHIFT modes for BPM/Zoom
+- **Loop Encoder**: Quick loop size adjustment with SHIFT for alternate functions
+
+#### Performance Pads
+- **Extended pad modes**: Hotcues, Loops, Stems, Remix, and more
+- **SHIFT + Pad Mode buttons**: Quick access to alternate performance modes
+- **Simplified FX control**: Pad-based FX easier to use than native mappings
+
+#### Screen Display
+- **On-screen overlays** for tempo, quantize, FX, and more—no laptop needed
+- **Context-aware displays** show the info you need when you need it
+
+### 2.4 Universal Shortcuts (All Controllers)
 
 #### Settings Navigation
 - **Invert Menu Ordering**: Flip list navigation direction (in Settings → Other → Mods)
