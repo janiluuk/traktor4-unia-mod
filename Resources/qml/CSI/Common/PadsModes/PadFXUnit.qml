@@ -8,24 +8,26 @@ Module {
     property int frameInc: 100 * frameRate
     property int frameTime: 1000 / frameRate // ~= 33
 
-    property int unit: 0
+    property int unit: 1  // Default to 1 to prevent invalid paths (0 would create "app.traktor.fx.0.type")
     property int changeStep: 0
     property var pad: null
 
-    AppProperty { id: assigned; path: "app.traktor.mixer.channels." + deckId + ".fx.assign." + unit }
-    AppProperty { id: type; path: "app.traktor.fx." + unit + ".type" }
-    AppProperty { id: routing; path: "app.traktor.fx." + unit + ".routing" }
-    AppProperty { id: drywet; path: "app.traktor.fx." + unit + ".dry_wet" }
-    AppProperty { id: knob1; path: "app.traktor.fx." + unit + ".knobs.1" }
-    AppProperty { id: knob2; path: "app.traktor.fx." + unit + ".knobs.2" }
-    AppProperty { id: knob3; path: "app.traktor.fx." + unit + ".knobs.3" }
-    AppProperty { id: effect1; path: "app.traktor.fx." + unit + ".select.1" }
-    AppProperty { id: effect2; path: "app.traktor.fx." + unit + ".select.2" }
-    AppProperty { id: effect3; path: "app.traktor.fx." + unit + ".select.3" }
-    AppProperty { id: enabled; path: "app.traktor.fx." + unit + ".enabled" }
-    AppProperty { id: button1; path: "app.traktor.fx." + unit + ".buttons.1" }
-    AppProperty { id: button2; path: "app.traktor.fx." + unit + ".buttons.2" }
-    AppProperty { id: button3; path: "app.traktor.fx." + unit + ".buttons.3" }
+    // Use safe path - default to unit 1 if unit is invalid
+    property string fxUnitPath: (unit >= 1 && unit <= 4) ? ("app.traktor.fx." + unit) : "app.traktor.fx.1"
+    AppProperty { id: assigned; path: "app.traktor.mixer.channels." + deckId + ".fx.assign." + (unit >= 1 ? unit : 1) }
+    AppProperty { id: type; path: fxUnitPath + ".type" }
+    AppProperty { id: routing; path: fxUnitPath + ".routing" }
+    AppProperty { id: drywet; path: fxUnitPath + ".dry_wet" }
+    AppProperty { id: knob1; path: fxUnitPath + ".knobs.1" }
+    AppProperty { id: knob2; path: fxUnitPath + ".knobs.2" }
+    AppProperty { id: knob3; path: fxUnitPath + ".knobs.3" }
+    AppProperty { id: effect1; path: fxUnitPath + ".select.1" }
+    AppProperty { id: effect2; path: fxUnitPath + ".select.2" }
+    AppProperty { id: effect3; path: fxUnitPath + ".select.3" }
+    AppProperty { id: enabled; path: fxUnitPath + ".enabled" }
+    AppProperty { id: button1; path: fxUnitPath + ".buttons.1" }
+    AppProperty { id: button2; path: fxUnitPath + ".buttons.2" }
+    AppProperty { id: button3; path: fxUnitPath + ".buttons.3" }
 
     Timer { id: pressTimer; interval: holdTimer.value; repeat: false }
     Timer { id: changeTimer; repeat: false; onTriggered: changeEffect() }

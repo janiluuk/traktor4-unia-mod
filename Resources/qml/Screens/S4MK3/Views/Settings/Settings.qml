@@ -253,7 +253,7 @@ FullscreenOverlay {
     //Other Settings
     readonly property variant timersNames: ["Browser View", "BPM/Key Overlay", "Mixer FX Overlay", "HotcueType Overlay", "Side Buttons Overlay"]
     readonly property variant fixesNames: ["Hotcue Triggering"]
-    readonly property variant modsNames: ["Only focused controls", "Beatmatch Practice", "Autoenable Flux", "AutoZoom Edit Mode", "Shift Mode", "Invert Menu Ordering", "Back to Top"]
+    readonly property variant modsNames: ["Only focused controls", "Beatmatch Practice", "Autoenable Flux", "AutoZoom Edit Mode", "Shift Mode", "Back to Top"]
 
     function thirdSettingsListNames(firstIndex, secondIndex){
         if (firstIndex == 1) { //Traktor Settings

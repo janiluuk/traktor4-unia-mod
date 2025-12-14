@@ -442,6 +442,9 @@ Item {
         anchors.fill: parent
         //visible: screenView.value == ScreenView.fxSettings
         state: screenView.value == ScreenView.fxSettings ? "visible" : "up"
+        propertiesPath: screen.propertiesPath
+        topFXUnit: topFXUnit
+        bottomFXUnit: bottomFXUnit
     }
 
     //Settings

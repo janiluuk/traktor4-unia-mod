@@ -7,6 +7,7 @@ Module {
     id: module
     property bool active: true
     property int deckId: 1 //1-4
+    property int focusedDeckId: deckId  // Default to deckId if not provided
     property string surface: "path"
 
     DeckTempo { name: "tempo"; channel: deckId }
@@ -27,7 +28,9 @@ Module {
     AppProperty { id: hotcueActive; path: selectedCuePath +  ".active" }
 
     //Warning message while browsing
-    AppProperty { id: deckLoadingWarning; path: "app.traktor.informer.deck_loading_warnings." + focusedDeckId + ".active";
+    // Use safe path: ensure focusedDeckId is valid (1-4) to prevent invalid paths
+    property int safeFocusedDeckId: (focusedDeckId >= 1 && focusedDeckId <= 4) ? focusedDeckId : deckId
+    AppProperty { id: deckLoadingWarning; path: "app.traktor.informer.deck_loading_warnings." + safeFocusedDeckId + ".active";
         onValueChanged:
             if (screenView.value == ScreenView.browser && deckLoadingWarning.value) {
                 screenOverlay.value = Overlay.browserWarnings

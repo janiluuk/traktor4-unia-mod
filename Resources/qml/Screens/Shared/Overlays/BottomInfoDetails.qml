@@ -227,7 +227,8 @@ Rectangle {
   AppProperty { id: activeCellRow; path: playerPropertyPath + ".active_cell_row" }
   property int sampleId: sequencerOn.value ? (sequencerSelectedRow.value+1) : (activeCellRow.value+1)
 
-  property string fxUnitPath: "app.traktor.fx." + fxUnit
+  // Use safe path - default to unit 1 if fxUnit is invalid
+  property string fxUnitPath: (fxUnit && fxUnit >= 1 && fxUnit <= 4) ? ("app.traktor.fx." + fxUnit) : "app.traktor.fx.1"
   property string stemDeckPropertyPath : "app.traktor.decks." + deckId + ".stems."
   property string remixDeckPropertyPath: "app.traktor.decks." + deckId + ".remix."
   property string playerPath: isStemDeck ? stemDeckPropertyPath + slotId : remixDeckPropertyPath + "players." + slotId

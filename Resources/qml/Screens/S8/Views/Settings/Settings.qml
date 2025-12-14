@@ -255,7 +255,7 @@ FullscreenOverlay {
         readonly property variant d2Names: ["D2 Deck Buttons"]
 
         //Display Settings
-        readonly property variant deckGeneralNames: ["Theme", "Panels", "Bright Mode (beta)", "Top Left Corner"]
+        readonly property variant deckGeneralNames: ["Theme", "Panels", "Bright Mode", "Top Left Corner"]
         readonly property variant browserNames: ["Related Screens", "Related Browsers", "Browser on Touch", "Rows in Browser", "Displayed Info", "Previously Played", "BPM Match Guides", "Key Match Guides", "Colored Keys", "Footer Info"]
         readonly property variant trackNames: ["Waveform Options", "Grid Options", "Stripe Options", "Performance Panel", "Beat Counter Settings", "Beat/Phase Widget", "Key Options"]
         readonly property variant remixNames: ["Volume Fader", "Filter Fader", "Slot Indicators"]
@@ -263,8 +263,8 @@ FullscreenOverlay {
         //Other Settings
         readonly property variant timersNames: ["Browser View", "BPM/Key Overlay", "Mixer FX Overlay", "HotcueType Overlay", "Side Buttons Overlay"]
         readonly property variant fixesNames: ["BPM Controls", "Hotcue Triggering"]
-        readonly property variant modsNames: ["Only focused controls", "Beatmatch Practice", "Autoenable Flux", "AutoZoom Edit Mode", "Shift Mode", "Invert Menu Ordering", "Back to Top"]
-        readonly property variant modsNamesD2: ["Only focused controls", "Beatmatch Practice", "Autoenable Flux", "AutoZoom Edit Mode", "Invert Menu Ordering", "Back to Top"]
+        readonly property variant modsNames: ["Only focused controls", "Beatmatch Practice", "Autoenable Flux", "AutoZoom Edit Mode", "Shift Mode", "Back to Top"]
+        readonly property variant modsNamesD2: ["Only focused controls", "Beatmatch Practice", "Autoenable Flux", "AutoZoom Edit Mode", "Back to Top"]
 
         function thirdSettingsListNames(firstIndex, secondIndex){
             if (firstIndex == 1) { //Traktor Settings

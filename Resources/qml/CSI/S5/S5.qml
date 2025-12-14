@@ -26,18 +26,120 @@ Mapping {
     MappingPropertyDescriptor { id: stemSelectorModeHold; path: "mapping.settings.stem_select_hold"; type: MappingPropertyDescriptor.Boolean; value: false }
     MappingPropertyDescriptor { id: stemResetOnLoad; path: "mapping.settings.stem_reset_on_load"; type: MappingPropertyDescriptor.Boolean; value: true }
 
-    //Settings - LED Brightness
-    MappingPropertyDescriptor { path: "mapping.settings.led_on_brightness"; type: MappingPropertyDescriptor.Integer; value: 100; min: 50; max: 100 }
-    MappingPropertyDescriptor { path: "mapping.settings.led_dimmed_percentage"; type: MappingPropertyDescriptor.Integer; value: 25; min: 0; max: 50  }
-    DirectPropertyAdapter { name: "LEDBrightnessOn"; path: "mapping.settings.led_on_brightness"; input: false }
-    DirectPropertyAdapter { name: "LEDDimmedPercentage"; path: "mapping.settings.led_dimmed_percentage"; input: false }
-    Wire { from: "s5.led_on_brightness.write"; to: "LEDBrightnessOn.read" }
-    Wire { from: "s5.led_dimmed_brightness.write"; to: "LEDDimmedPercentage.read" }
     readonly property real bright: 1.0
     readonly property real dimmed: 0.0
 
     //Settings - MIDI Controls //keep this as a dummy to avoid having qml warnings in the screen (MIDI Only for the D2 & S8)
     MappingPropertyDescriptor { id: useMIDIControls; path: "mapping.settings.use_midi_controls"; type: MappingPropertyDescriptor.Boolean; value: false }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    onMappingLoaded: {
+        left.initializeModule();
+        right.initializeModule();
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    S5 {
+        name: "s5"
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    //  LED Brightness wiring
+    //------------------------------------------------------------------------------------------------------------------
+
+    MappingPropertyDescriptor { path: "mapping.settings.led_on_brightness"; type: MappingPropertyDescriptor.Integer; value: 100; min: 50; max: 100 }
+    MappingPropertyDescriptor { path: "mapping.settings.led_dimmed_percentage"; type: MappingPropertyDescriptor.Integer; value: 25; min: 25; max: 50  }
+    DirectPropertyAdapter { name: "LEDBrightnessOn"; path: "mapping.settings.led_on_brightness"; input: false }
+    DirectPropertyAdapter { name: "LEDDimmedPercentage"; path: "mapping.settings.led_dimmed_percentage"; input: false }
+    Wire { from: "s5.led_on_brightness.write"; to: "LEDBrightnessOn.read" }
+    Wire { from: "s5.led_dimmed_brightness.write"; to: "LEDDimmedPercentage.read" }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    S5Side {
+        id: left
+        name: "left"
+        topDeckId: 1
+        bottomDeckId: 3
+        surface: "s5.left"
+        settingsPath: "mapping.settings.left"
+        propertiesPath: "mapping.state.left"
+        onlyFocusedDeck: onlyFocusedDeck.value
+        stemResetOnLoad: stemResetOnLoad.value
+        stemSelectorModeHold: stemSelectorModeHold.value
+    }
+
+    S5Side {
+        id: right
+        name: "right"
+        topDeckId: 2
+        bottomDeckId: 4
+        surface: "s5.right"
+        settingsPath: "mapping.settings.right"
+        propertiesPath: "mapping.state.right"
+        onlyFocusedDeck: onlyFocusedDeck.value
+        stemResetOnLoad: stemResetOnLoad.value
+        stemSelectorModeHold: stemSelectorModeHold.value
+    }
+    
+    Mixer {
+        id: mixer
+        name: "mixer"
+        surface: "s5"
+        shift: left.shift || right.shift
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // CROSS-DISPLAY INTERACTION
+    //------------------------------------------------------------------------------------------------------------------
+
+    //Focused Ids (necessary for duplicating decks)
+    MappingPropertyDescriptor { id: leftFocusedDeckId; path: "mapping.state.leftFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: left.focusedDeckId }
+    MappingPropertyDescriptor { id: rightFocusedDeckId; path: "mapping.state.rightFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: right.focusedDeckId }
+
+    property bool leftScreenViewValue: left.screenView.value
+    property bool rightScreenViewValue: right.screenView.value
+
+    onLeftScreenViewValueChanged: {
+        if (left.screenView.value == ScreenView.browser) {
+            if (traktorRelatedBrowser.value) {
+                fullscreenBrowser.value = true
+            }
+            if (!independentScreenBrowser.value && right.screenView.value == ScreenView.browser) {
+                right.screenView.value = ScreenView.deck
+            }
+        }
+        else if (left.screenView.value == ScreenView.deck) {
+            if (traktorRelatedBrowser.value && right.screenView.value == ScreenView.deck) {
+                fullscreenBrowser.value = false
+            }
+            if (right.screenView.value != ScreenView.browser) {
+                unloadPreviewPlayer.value = true
+            }
+        }
+    }
+    onRightScreenViewValueChanged: {
+        if (right.screenView.value == ScreenView.browser) {
+            if (traktorRelatedBrowser.value) {
+                fullscreenBrowser.value = true
+            }
+            if (!independentScreenBrowser.value && left.screenView.value == ScreenView.browser) {
+                left.screenView.value = ScreenView.deck
+            }
+        }
+        else if (right.screenView.value == ScreenView.deck) {
+            if (traktorRelatedBrowser.value && left.screenView.value == ScreenView.deck) {
+                fullscreenBrowser.value = false
+            }
+            if (left.screenView.value != ScreenView.browser) {
+                unloadPreviewPlayer.value = true
+            }
+        }
+    }
 
 //------------------------------------------------------------------------------------------------------------------
 // MAPPING SETTINGS
@@ -45,13 +147,10 @@ Mapping {
 
     //Shift
     MappingPropertyDescriptor { id: globalShiftEnabled; path: "mapping.settings.globalShift"; type: MappingPropertyDescriptor.Boolean; value: false }
-    MappingPropertyDescriptor { id: globalShift; path: "mapping.state.shift"; type: MappingPropertyDescriptor.Boolean; value: globalShiftEnabled.value && (leftShift.value || rightShift.value) }
+    MappingPropertyDescriptor { id: globalShift; path: "mapping.state.shift"; type: MappingPropertyDescriptor.Boolean; value: false }
 
     MappingPropertyDescriptor { id: leftShift; path: "mapping.state.left.shift"; type: MappingPropertyDescriptor.Boolean; value: false }
-    Wire { from: "s5.left.shift"; to: DirectPropertyAdapter { path: leftShift.path } }
-
     MappingPropertyDescriptor { id: rightShift; path: "mapping.state.right.shift"; type: MappingPropertyDescriptor.Boolean; value: false }
-    Wire { from: "s5.right.shift"; to: DirectPropertyAdapter { path: rightShift.path } }
 
     //Transport buttons
     MappingPropertyDescriptor { id: playButton; path: "mapping.settings.playButton"; type: MappingPropertyDescriptor.Integer; value: 0; min: 0; max: 1 } //0: Play, 1: Vinyl Break
@@ -246,110 +345,38 @@ Mapping {
     AppProperty { id: masterMode; path: "app.traktor.masterclock.mode" }
     AppProperty { id: clockBpm; path: "app.traktor.masterclock.tempo" }
 
-    //Master - Deck properties
-    AppProperty { id: masterDeckType; path: "app.traktor.decks." + (masterId.value+1) + ".type" }
-    AppProperty { id: masterResultingKeyIndex; path: "app.traktor.decks." + (masterId.value+1) + ".track.key.final_id" }
-
 //------------------------------------------------------------------------------------------------------------------
-// MODULES INITIALIZATION
+//  Deck focus
 //------------------------------------------------------------------------------------------------------------------
+    
+    //------------------------------------------------------------------------------------------------------------------
+    //  Deck focus
+    //------------------------------------------------------------------------------------------------------------------
 
-    S5 {
-        name: "s5"
-    }
-
-    Mixer {
-        name: "mixer"
-        surface: "s5.mixer"
-        shift: leftShift.value || rightShift.value
-    }
-
-    S5Side {
-        id: left
-        name: "left"
-        topDeckId: 1
-        bottomDeckId: 3
-        surface: "s5.left"
-        settingsPath: "mapping.settings.left"
-        propertiesPath: "mapping.state.left"
-        shift: (globalShift.value && globalShiftEnabled.value) || (leftShift.value && !globalShiftEnabled.value)
-        onlyFocusedDeck: onlyFocusedDeck.value
-    }
-
-    S5Side {
-        id: right
-        name: "right"
-        topDeckId: 2
-        bottomDeckId: 4
-        surface: "s5.right"
-        settingsPath: "mapping.settings.right"
-        propertiesPath: "mapping.state.right"
-        shift: (globalShift.value && globalShiftEnabled.value) || (rightShift.value && !globalShiftEnabled.value)
-        onlyFocusedDeck: onlyFocusedDeck.value
-    }
-
-    SettingsLoader {
-        id: settingsLoader
-    }
-
-    onRunningChanged: {
-        console.log("S5 Running: " + running)
-        if (running) {
-            left.initializeModule();
-            right.initializeModule();
-            settingsLoader.readTraktorSettings();
+    Wire {
+        from: "s5.left.deck"
+        to: ButtonScriptAdapter {
+            onPress: {
+                if (left) {
+                    left.deckFocus = !left.deckFocus;
+                }
+            }
+            brightness: 1.0
+            color: (left && left.deckFocus) ? Color.White : Color.Blue
         }
     }
 
-//------------------------------------------------------------------------------------------------------------------
-// CROSS-DISPLAY INTERACTION
-//------------------------------------------------------------------------------------------------------------------
-
-    //Focused Ids (necessary for duplicating decks)
-    MappingPropertyDescriptor { id: leftFocusedDeckId; path: "mapping.state.leftFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: left.focusedDeckId }
-    MappingPropertyDescriptor { id: rightFocusedDeckId; path: "mapping.state.rightFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: right.focusedDeckId }
-
-    //Keep focused deck ids aligned with the currently active layer
-    Binding { target: leftFocusedDeckId; property: "value"; value: left.focusedDeckId }
-    Binding { target: rightFocusedDeckId; property: "value"; value: right.focusedDeckId }
-
-    property bool leftScreenViewValue: left.screenView
-    property bool rightScreenViewValue: right.screenView
-
-    onLeftScreenViewValueChanged: {
-        if (left.screenView == ScreenView.browser) {
-            if (traktorRelatedBrowser.value) {
-                fullscreenBrowser.value = true
+    Wire {
+        from: "s5.right.deck"
+        to: ButtonScriptAdapter {
+            onPress: {
+                if (right) {
+                    right.deckFocus = !right.deckFocus;
+                }
             }
-            if (!independentScreenBrowser.value && right.screenView == ScreenView.browser) {
-                right.screenView = ScreenView.deck
-            }
-        }
-        else if (left.screenView == ScreenView.deck) {
-            if (traktorRelatedBrowser.value && right.screenView == ScreenView.deck) {
-                fullscreenBrowser.value = false
-            }
-            if (right.screenView != ScreenView.browser) {
-                unloadPreviewPlayer.value = true
-            }
+            brightness: 1.0
+            color: (right && right.deckFocus) ? Color.White : Color.Blue
         }
     }
-    onRightScreenViewValueChanged: {
-        if (right.screenView == ScreenView.browser) {
-            if (traktorRelatedBrowser.value) {
-                fullscreenBrowser.value = true
-            }
-            if (!independentScreenBrowser.value && left.screenView == ScreenView.browser) {
-                left.screenView = ScreenView.deck
-            }
-        }
-        else if (right.screenView == ScreenView.deck) {
-            if (traktorRelatedBrowser.value && left.screenView == ScreenView.deck) {
-                fullscreenBrowser.value = false
-            }
-            if (left.screenView != ScreenView.browser) {
-                unloadPreviewPlayer.value = true
-            }
-        }
-    }
+
 }

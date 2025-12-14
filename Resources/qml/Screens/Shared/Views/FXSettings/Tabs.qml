@@ -3,22 +3,24 @@ import CSI 1.0
 
 Item {
     id: tabs
-    property int unit
-    property int activeTab
-    property bool focused
+    property int unit: 1  // Default to 1 to prevent invalid paths
+    property int activeTab: 0
+    property bool focused: false
 
     width: parent.width
     height: 19
 
-    property string fxUnitName: unit != 0 ? ("FX UNIT: " + unit) : "FX UNIT: DISABLED"
+    // Use safe path - default to unit 1 if unit is invalid
+    property string fxUnitPath: (unit >= 1 && unit <= 4) ? ("app.traktor.fx." + unit) : "app.traktor.fx.1"
+    property string fxUnitName: (unit >= 1 && unit <= 4) ? ("FX UNIT: " + unit) : "FX UNIT: DISABLED"
     // INFO: Awaiting for the Traktor team to support Pattern Player kit selection...
-    readonly property variant headerNames: [fxUnitName, fxType.value == FxType.PatternPlayer ? "808 Kit" : fxSelectList1.description, fxSelectList2.description, fxSelectList3.description]
+    readonly property variant headerNames: [fxUnitName, (fxType && fxType.value == FxType.PatternPlayer) ? "808 Kit" : (fxSelectList1 ? fxSelectList1.description : ""), (fxSelectList2 ? fxSelectList2.description : ""), (fxSelectList3 ? fxSelectList3.description : "")]
     readonly property int macroEffectChar: 0x00B6
 
-    AppProperty { id: fxType; path: "app.traktor.fx." + unit + ".type" }
-    AppProperty { id: fxSelectList1; path: "app.traktor.fx." + unit + ".select.1" }
-    AppProperty { id: fxSelectList2; path: "app.traktor.fx." + unit + ".select.2" }
-    AppProperty { id: fxSelectList3; path: "app.traktor.fx." + unit + ".select.3" }
+    AppProperty { id: fxType; path: fxUnitPath + ".type" }
+    AppProperty { id: fxSelectList1; path: fxUnitPath + ".select.1" }
+    AppProperty { id: fxSelectList2; path: fxUnitPath + ".select.2" }
+    AppProperty { id: fxSelectList3; path: fxUnitPath + ".select.3" }
 
     Row {
         spacing: 1
@@ -41,7 +43,7 @@ Item {
                     width: 12
                     height: 11
                     radius: 1
-                    visible: isMacroFx && (index == 1 || (fxType.value==FxType.Group) )
+                    visible: isMacroFx && (index == 1 || (fxType && fxType.value==FxType.Group) )
                     color: focused && index == activeTab ? colors.colorBlack85 : colors.colorGrey80
 
                     Text {
@@ -55,7 +57,7 @@ Item {
                 }
 
                 Text {
-                    visible: index == 0 || index == 1 || fxType.value == FxType.Group
+                    visible: index == 0 || index == 1 || (fxType && fxType.value == FxType.Group)
                     anchors.centerIn: parent
                     anchors.fill: parent
                     anchors.topMargin: 2

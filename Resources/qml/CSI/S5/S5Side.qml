@@ -7,16 +7,19 @@ import "../../Helpers/LED.js" as LED
 
 Module {
     id: side
+    property bool useMIDIControls: false
     property int topDeckId: 1  // Set by parent (S5.qml)
     property int bottomDeckId: 3  // Set by parent (S5.qml)
     property string surface: "hw.side"
     property string settingsPath: "mapping.settings.left"
     property string propertiesPath: "mapping.state.left"
-    property bool shift: false
     property bool onlyFocusedDeck: false  // Set by parent (S5.qml)
+    property bool stemResetOnLoad: true  // Set by parent (S5.qml)
+    property bool stemSelectorModeHold: false  // Set by parent (S5.qml)
     readonly property real bright: 1.0
 
-    property alias screenView: screenView.value //necessary for the cross-display interaction
+    // Note: screenView alias is defined after the MappingPropertyDescriptor to avoid forward reference
+    // Will be set up after screenView MappingPropertyDescriptor is defined
 
     //Master clock
     AppProperty { id: masterId; path: "app.traktor.masterclock.source_id" } //-1: MasterClock, 0: Deck A, 1: Deck B, 2: Deck C, 3: Deck D
@@ -30,7 +33,7 @@ Module {
 
     //FXs Control Assignment
     MappingPropertyDescriptor { id: topFXUnit; path: settingsPath + ".topFXUnit"; type: MappingPropertyDescriptor.Integer; min: 1; max: 4 }
-    MappingPropertyDescriptor { id: bottomFXUnit; path: settingsPath + ".bottomFXUnit"; type: MappingPropertyDescriptor.Integer; min: 0; max: 4; onValueChanged: { updateFooterPage(); if (value != 0) padFXsUnit.value = value } }
+    MappingPropertyDescriptor { id: bottomFXUnit; path: settingsPath + ".bottomFXUnit"; type: MappingPropertyDescriptor.Integer; min: 0; max: 4; onValueChanged: { if (typeof updateFooterPage === 'function') updateFooterPage(); if (value != 0) padFXsUnit.value = value } }
     MappingPropertyDescriptor { id: padFXsUnit; path: settingsPath + ".padFXsUnit"; type: MappingPropertyDescriptor.Integer; min: 1; max: 4 }
     MappingPropertyDescriptor { id: padFXsBank; path: propertiesPath + ".padFXsBank"; type: MappingPropertyDescriptor.Integer; value: 1; min: 1; max: 8 }
 
@@ -89,15 +92,63 @@ Module {
     MappingPropertyDescriptor { path: propertiesPath + ".softtakeover.faders.4.input"; type: MappingPropertyDescriptor.Float; value: 0.0 }
     MappingPropertyDescriptor { path: propertiesPath + ".softtakeover.faders.4.output"; type: MappingPropertyDescriptor.Float; value: 0.0 }
 
+    // Shift - must be defined early for hardware recognition
+    property alias shift: shiftProp.value
+    MappingPropertyDescriptor { id: shiftProp; path: propertiesPath + ".shift"; type: MappingPropertyDescriptor.Boolean; value: false }
+    Wire { from: "%surface%.shift"; to: DirectPropertyAdapter { path: propertiesPath + ".shift" } }
+
+//------------------------------------------------------------------------------------------------------------------
+// SCREEN VIEW (defined early for S5Deck components, handler is safe)
+//------------------------------------------------------------------------------------------------------------------
+
+    MappingPropertyDescriptor { id: screenViewProp; path: propertiesPath + ".screen_view"; type: MappingPropertyDescriptor.Integer; value: ScreenView.deck } //deck: 0, browser: 1, screen settings: 2
+    
+    // Define alias after screenViewProp is defined
+    property alias screenView: screenViewProp
+
+    //Pads focus Properties (defined early for S5Deck components)
+    property bool padsModeReady: false
+    MappingPropertyDescriptor { id: activePadsMode; path: propertiesPath + ".pads_mode"; type: MappingPropertyDescriptor.Integer; value: PadsMode.disabled; 
+        onValueChanged: {
+            if (padsModeReady) updatePads()
+        }
+    }
+
+    // updateFooterPage function moved earlier (see above)
+    function updateFooterPage() {
+        if (!footerDeck().validateFooterPage(footerPage.value)) {
+            footerDeck().defaultFooterPage()
+        }
+    }
+    
+    // Initialize focusedDeckId and unfocusedDeckId with safe defaults - will be updated in Component.onCompleted
+    property int focusedDeckId: topDeckId
+    property int unfocusedDeckId: bottomDeckId
+
 //------------------------------------------------------------------------------------------------------------------
 // DECKS INITIALIZATION
 //------------------------------------------------------------------------------------------------------------------
 
     function initializeModule() {
-        focusedDeck().padsMode = focusedDeck().defaultPadsMode()
-        unfocusedDeck().padsMode = unfocusedDeck().defaultPadsMode()
-        activePadsMode.value = focusedDeck().padsMode
-        footerDeck().defaultFooterPage()
+        // Update remixId and footerId first, before accessing decks
+        remixId = getRemixId();
+        footerId = getFooterId();
+        
+        var focused = focusedDeck();
+        var unfocused = unfocusedDeck();
+        var footer = footerDeck();
+        if (focused) {
+            focused.padsMode = focused.defaultPadsMode();
+            // Set padsModeReady before changing activePadsMode to allow updatePads to run
+            padsModeReady = true
+            activePadsMode.value = focused.padsMode;
+        }
+        if (unfocused) {
+            unfocused.padsMode = unfocused.defaultPadsMode();
+        }
+        if (footer) {
+            footer.defaultFooterPage();
+        }
 
         if (!topFXUnit.value) topFXUnit.value = topDeckId;
         if (!bottomFXUnit.value) bottomFXUnit.value = 0;
@@ -107,33 +158,61 @@ Module {
     S5Deck {
         id: deckA
         name: "deckA"
-        active: (topDeckId == 1 && topDeckFocused.value) || (bottomDeckId == 1 && !topDeckFocused.value)
+        active: (topDeckFocused && topDeckFocused.value !== undefined) ? ((topDeckId == 1 && topDeckFocused.value) || (bottomDeckId == 1 && !topDeckFocused.value)) : (topDeckId == 1)
         deckId: 1
         surface: side.surface
+        settingsPath: side.settingsPath
+        propertiesPath: side.propertiesPath
+        footerId: side.footerId
+        remixId: side.remixId
+        activePadsMode: side.activePadsMode
+        screenView: side.screenView
+        updateFooterPage: side.updateFooterPage
     }
 
     S5Deck {
         id: deckB
         name: "deckB"
-        active: (topDeckId == 2 && topDeckFocused.value) || (bottomDeckId == 2 && !topDeckFocused.value)
+        active: (topDeckFocused && topDeckFocused.value !== undefined) ? ((topDeckId == 2 && topDeckFocused.value) || (bottomDeckId == 2 && !topDeckFocused.value)) : (topDeckId == 2)
         deckId: 2
         surface: side.surface
+        settingsPath: side.settingsPath
+        propertiesPath: side.propertiesPath
+        footerId: side.footerId
+        remixId: side.remixId
+        activePadsMode: side.activePadsMode
+        screenView: side.screenView
+        updateFooterPage: side.updateFooterPage
     }
 
     S5Deck {
         id: deckC
         name: "deckC"
-        active: (topDeckId == 3 && topDeckFocused.value) || (bottomDeckId == 3 && !topDeckFocused.value)
+        active: (topDeckFocused && topDeckFocused.value !== undefined) ? ((topDeckId == 3 && topDeckFocused.value) || (bottomDeckId == 3 && !topDeckFocused.value)) : (topDeckId == 3)
         deckId: 3
         surface: side.surface
+        settingsPath: side.settingsPath
+        propertiesPath: side.propertiesPath
+        footerId: side.footerId
+        remixId: side.remixId
+        activePadsMode: side.activePadsMode
+        screenView: side.screenView
+        updateFooterPage: side.updateFooterPage
     }
 
     S5Deck {
         id: deckD
         name: "deckD"
-        active: (topDeckId == 4 && topDeckFocused.value) || (bottomDeckId == 4 && !topDeckFocused.value)
+        active: (topDeckFocused && topDeckFocused.value !== undefined) ? ((topDeckId == 4 && topDeckFocused.value) || (bottomDeckId == 4 && !topDeckFocused.value)) : (topDeckId == 4)
         deckId: 4
         surface: side.surface
+        settingsPath: side.settingsPath
+        propertiesPath: side.propertiesPath
+        footerId: side.footerId
+        remixId: side.remixId
+        activePadsMode: side.activePadsMode
+        screenView: side.screenView
+        updateFooterPage: side.updateFooterPage
     }
 
 //------------------------------------------------------------------------------------------------------------------
@@ -141,38 +220,78 @@ Module {
 //------------------------------------------------------------------------------------------------------------------
 
     //Focus
-    MappingPropertyDescriptor { id: topDeckFocused; path: propertiesPath + ".top_deck_focus"; type: MappingPropertyDescriptor.Boolean; value: true;
+    MappingPropertyDescriptor { 
+        id: topDeckFocused
+        path: propertiesPath + ".top_deck_focus"
+        type: MappingPropertyDescriptor.Boolean
+        value: true
         onValueChanged: {
-            if (screenView.value == ScreenView.deck) {
-                screenOverlay.value = Overlay.none
+            // Update focusedDeckId and unfocusedDeckId
+            focusedDeckId = topDeckFocused.value ? topDeckId : bottomDeckId
+            unfocusedDeckId = !topDeckFocused.value ? topDeckId : bottomDeckId
+            
+            if (screenViewProp && screenViewProp.value == ScreenView.deck) {
+                if (screenOverlay) screenOverlay.value = Overlay.none
             }
-            if (editMode.value != EditMode.disabled) {
+            if (editMode && editMode.value != EditMode.disabled) {
                 editMode.value = EditMode.disabled
             }
-            if (!((activePadsMode.value == PadsMode.remix || activePadsMode.value == PadsMode.legacyRemix) && focusedDeck().validatePadsMode(unfocusedDeck().padsMode) && focusedDeck().deckType != unfocusedDeck().deckType)) {
-                activePadsMode.value = focusedDeck().padsMode
+            var focused = focusedDeck();
+            var unfocused = unfocusedDeck();
+            if (focused && unfocused && !((activePadsMode.value == PadsMode.remix || activePadsMode.value == PadsMode.legacyRemix) && focused.validatePadsMode(unfocused.padsMode) && focused.deckType != unfocused.deckType)) {
+                activePadsMode.value = focused.padsMode
             }
-            updatePads()
+            if (padsModeReady) updatePads()
         }
     }
+    property alias deckFocus: topDeckFocused.value
+    
+    Component.onCompleted: {
+        // Initialize focusedDeckId and unfocusedDeckId after topDeckFocused is ready
+        focusedDeckId = topDeckFocused.value ? topDeckId : bottomDeckId
+        unfocusedDeckId = !topDeckFocused.value ? topDeckId : bottomDeckId
+    }
 
-    property int focusedDeckId: topDeckFocused.value ? topDeckId : bottomDeckId
-    property int unfocusedDeckId: !topDeckFocused.value ? topDeckId : bottomDeckId
-    property int remixId: (focusedDeck().hasRemixProperties || !unfocusedDeck().hasRemixProperties) || onlyFocusedDeck.value ? focusedDeckId : unfocusedDeckId
-    property int footerId: (focusedDeck().hasBottomControls || !unfocusedDeck().hasBottomControls) || onlyFocusedDeck.value ? focusedDeckId : unfocusedDeckId
+    
+    // Helper function to safely get remixId
+    function getRemixId() {
+        var focused = focusedDeck();
+        var unfocused = unfocusedDeck();
+        if (!focused || !unfocused) return focusedDeckId;
+        return ((focused.hasRemixProperties || !unfocused.hasRemixProperties) || onlyFocusedDeck) ? focusedDeckId : unfocusedDeckId;
+    }
+    
+    // Helper function to safely get footerId
+    function getFooterId() {
+        var focused = focusedDeck();
+        var unfocused = unfocusedDeck();
+        if (!focused || !unfocused) return focusedDeckId;
+        return ((focused.hasBottomControls || !unfocused.hasBottomControls) || onlyFocusedDeck) ? focusedDeckId : unfocusedDeckId;
+    }
+    
+    // Initialize with safe defaults - these are updated in initializeModule()
+    property int remixId: topDeckId
+    property int footerId: topDeckId
 
-    function master() { return deck(masterId.value + 1) }
+    function master() { 
+        // Use safe masterDeckId: if masterId is -1, use 1 as fallback
+        var safeMasterDeckId = (masterId.value >= 0) ? (masterId.value + 1) : 1;
+        return deck(safeMasterDeckId);
+    }
     function focusedDeck() { return deck(focusedDeckId) }
     function unfocusedDeck() { return deck(unfocusedDeckId) }
     function remixDeck() { return deck(remixId) }
     function footerDeck() { return deck(footerId) }
 
     function deck(id) {
+        // Ensure id is valid (1-4) to prevent returning undefined
+        if (id < 1 || id > 4) return deckA; // fallback to deckA
         switch (id) {
             case 1: return deckA
             case 2: return deckB
             case 3: return deckC
             case 4: return deckD
+            default: return deckA
         }
     }
 
@@ -188,8 +307,8 @@ Module {
         }
         onRelease: {
             if (holdDeck_countdown.running) {
-                if (shift && screenView.value == ScreenView.deck) screenView.value = ScreenView.fxSettings
-                else if (screenView.value == ScreenView.fxSettings) screenView.value = ScreenView.deck
+                if (shift && screenViewProp && screenViewProp.value == ScreenView.deck) screenViewProp.value = ScreenView.fxSettings
+                else if (screenViewProp && screenViewProp.value == ScreenView.fxSettings) screenViewProp.value = ScreenView.deck
                 else topDeckFocused.value = !topDeckFocused.value
             }
             holdDeck_countdown.stop()
@@ -202,26 +321,29 @@ Module {
         }
     }
 
-    //Pads focus Properties
-    MappingPropertyDescriptor { id: activePadsMode; path: propertiesPath + ".pads_mode"; type: MappingPropertyDescriptor.Integer; value: PadsMode.disabled; onValueChanged: updatePads() }
+    //Pads focus Properties (moved earlier, see above)
 
     function updatePads() {
-        if (focusedDeck().validatePadsMode(activePadsMode.value)) {
-            focusedDeck().padsMode = activePadsMode.value
-            focusedDeck().enablePads = true
+        var focused = focusedDeck();
+        var remix = remixDeck();
+        if (!focused) return;
+        
+        if (focused.validatePadsMode(activePadsMode.value)) {
+            focused.padsMode = activePadsMode.value
+            focused.enablePads = true
             disablePads(focusedDeckId)
         }
-        else if (remixDeck().validatePadsMode(activePadsMode.value) && (activePadsMode.value == PadsMode.legacyRemix || activePadsMode.value == PadsMode.remix)) {
-            remixDeck().padsMode = activePadsMode.value
-            remixDeck().enablePads = true
+        else if (remix && remix.validatePadsMode(activePadsMode.value) && (activePadsMode.value == PadsMode.legacyRemix || activePadsMode.value == PadsMode.remix)) {
+            remix.padsMode = activePadsMode.value
+            remix.enablePads = true
             disablePads(remixId)
-            if (focusedDeck().defaultPadsMode() != PadsMode.disabled) {
-                focusedDeck().padsMode = focusedDeck().defaultPadsMode()
+            if (focused.defaultPadsMode() != PadsMode.disabled) {
+                focused.padsMode = focused.defaultPadsMode()
             }
         }
-        else if (focusedDeck().validatePadsMode(focusedDeck().defaultPadsMode())) {
-            activePadsMode.value = focusedDeck().defaultPadsMode()
-            focusedDeck().enablePads = true
+        else if (focused.validatePadsMode(focused.defaultPadsMode())) {
+            activePadsMode.value = focused.defaultPadsMode()
+            focused.enablePads = true
             disablePads(focusedDeckId)
         }
         else {
@@ -250,15 +372,8 @@ Module {
         propertiesPath: side.propertiesPath
     }
     Wire { from: "screen.output"; to: "%surface%.display" }
-
-    MappingPropertyDescriptor { id: screenView; path: propertiesPath + ".screen_view"; type: MappingPropertyDescriptor.Integer; value: ScreenView.deck; //deck: 0, browser: 1, screen settings: 2
-        onValueChanged: {
-            if (screenView.value != ScreenView.deck) {
-                screenOverlay.value = Overlay.none
-                editMode.value = EditMode.disabled
-            }
-        }
-    }
+    Wire { from: "screen.screen_view_state"; to: DirectPropertyAdapter { path: propertiesPath + ".screen_view"; input: false } }
+    
     MappingPropertyDescriptor { id: screenIsSingleDeck; path: propertiesPath + ".screenIsSingleDeck"; type: MappingPropertyDescriptor.Boolean; value: true }
 
     //Browser View
@@ -285,7 +400,7 @@ Module {
     }
 
     //Browser navigation - use explicit load command to ensure correct deck
-    AppProperty { id: loadSelected; path: "app.traktor.decks." + focusedDeckId + ".load.selected" }
+    AppProperty { id: loadSelected; path: "app.traktor.decks." + safeFocusedDeckId + ".load.selected" }
     MappingProperty { id: browserEnterNode; path: propertiesPath + ".browserEnterNode" }
     
     WiresGroup {
@@ -325,7 +440,9 @@ Module {
         }
     }
 
-    AppProperty { id: waveformZoom; path: "app.traktor.decks." + focusedDeckId + ".track.waveform_zoom" }
+    // Use safe path: ensure focusedDeckId is valid (1-4) to prevent invalid paths
+    property int safeFocusedDeckId: (focusedDeckId >= 1 && focusedDeckId <= 4) ? focusedDeckId : topDeckId
+    AppProperty { id: waveformZoom; path: "app.traktor.decks." + safeFocusedDeckId + ".track.waveform_zoom" }
     MappingPropertyDescriptor { id: zoomedEditView; path: propertiesPath + ".beatgrid.zoomed_view"; type: MappingPropertyDescriptor.Boolean; value: false
         onValueChanged: {
             if (zoomedEditView.value) {
@@ -442,10 +559,13 @@ Module {
     }
 
     //BPM overlay
-    AppProperty { id: isSyncEnabled; path: "app.traktor.decks." + focusedDeckId + ".sync.enabled" }
+    // Use safe masterDeckId: if masterId is -1, use 1 as fallback
+    // Removed property safeMasterDeckId to avoid accessing masterId.value during initialization
+    AppProperty { id: isSyncEnabled; path: "app.traktor.decks." + safeFocusedDeckId + ".sync.enabled" }
     AppProperty { path: "app.traktor.masterclock.tempo";
         onValueChanged: {
-            if (screenOverlay.value == Overlay.bpm && (isSyncEnabled.value || (masterId.value+1) == focusedDeckId)){
+            var safeMasterDeckId = (masterId && masterId.value >= 0) ? (masterId.value + 1) : 1
+            if (screenOverlay && screenOverlay.value == Overlay.bpm && (isSyncEnabled.value || safeMasterDeckId == safeFocusedDeckId)){
                 overlay_countdown.restart();
             }
         }
@@ -463,21 +583,52 @@ Module {
         }
     }
     MappingPropertyDescriptor { id: previousFooterPage; path: propertiesPath + ".previousFooter_page"; type: MappingPropertyDescriptor.Integer; value: FooterPage.empty }
-    MappingPropertyDescriptor { id: footerHasContent; path: propertiesPath + ".footerHasContent"; type: MappingPropertyDescriptor.Boolean; value: useMIDIControls.value || hasFXFooter.value || footerDeck().hasBottomControls; onValueChanged: { updateFooterPage() } }
-    MappingPropertyDescriptor { id: footerHasContentToSwitch; path: propertiesPath + ".footerHasContentToSwitch"; type: MappingPropertyDescriptor.Boolean; value: (useMIDIControls.value && hasFXFooter.value) || footerDeck().hasBottomControls }
+    // Define useMIDIControls as a property (defaults to false, not used in S5)
+    property bool useMIDIControls: false
+    
     AppProperty { id: fxMode; path: "app.traktor.fx.4fx_units" }
-    MappingPropertyDescriptor { id: hasFXFooter; path: propertiesPath + ".hasFXFooter"; type: MappingPropertyDescriptor.Boolean; value: bottomFXUnit.value == 1 || bottomFXUnit.value == 2 || (bottomFXUnit.value == 3 && fxMode.value == FxMode.FourFxUnits) || (bottomFXUnit.value == 4 && fxMode.value == FxMode.FourFxUnits); onValueChanged: { updateFooterPage() } }
-    property bool useMIDI: useMIDIControls.value
+    MappingPropertyDescriptor { id: hasFXFooter; path: propertiesPath + ".hasFXFooter"; type: MappingPropertyDescriptor.Boolean; value: false; onValueChanged: { updateFooterPage() } }
+    MappingPropertyDescriptor { id: footerHasContent; path: propertiesPath + ".footerHasContent"; type: MappingPropertyDescriptor.Boolean; value: false; onValueChanged: { updateFooterPage() } }
+    MappingPropertyDescriptor { id: footerHasContentToSwitch; path: propertiesPath + ".footerHasContentToSwitch"; type: MappingPropertyDescriptor.Boolean; value: false }
+    
+    // Update these properties after initialization
+    Component.onCompleted: {
+        // Update hasFXFooter
+        hasFXFooter.value = bottomFXUnit.value == 1 || bottomFXUnit.value == 2 || (bottomFXUnit.value == 3 && fxMode.value == FxMode.FourFxUnits) || (bottomFXUnit.value == 4 && fxMode.value == FxMode.FourFxUnits)
+        
+        // Update footerHasContent and footerHasContentToSwitch
+        var footer = footerDeck()
+        footerHasContent.value = useMIDIControls || hasFXFooter.value || (footer && footer.hasBottomControls)
+        footerHasContentToSwitch.value = (useMIDIControls && hasFXFooter.value) || (footer && footer.hasBottomControls)
+    }
+    
+    // Update when dependencies change
+    Connections {
+        target: bottomFXUnit
+        function onValueChanged() {
+            hasFXFooter.value = bottomFXUnit.value == 1 || bottomFXUnit.value == 2 || (bottomFXUnit.value == 3 && fxMode.value == FxMode.FourFxUnits) || (bottomFXUnit.value == 4 && fxMode.value == FxMode.FourFxUnits)
+            var footer = footerDeck()
+            footerHasContent.value = useMIDIControls || hasFXFooter.value || (footer && footer.hasBottomControls)
+            footerHasContentToSwitch.value = (useMIDIControls && hasFXFooter.value) || (footer && footer.hasBottomControls)
+        }
+    }
+    
+    Connections {
+        target: fxMode
+        function onValueChanged() {
+            hasFXFooter.value = bottomFXUnit.value == 1 || bottomFXUnit.value == 2 || (bottomFXUnit.value == 3 && fxMode.value == FxMode.FourFxUnits) || (bottomFXUnit.value == 4 && fxMode.value == FxMode.FourFxUnits)
+            var footer = footerDeck()
+            footerHasContent.value = useMIDIControls || hasFXFooter.value || (footer && footer.hasBottomControls)
+            footerHasContentToSwitch.value = (useMIDIControls && hasFXFooter.value) || (footer && footer.hasBottomControls)
+        }
+    }
+    property bool useMIDI: useMIDIControls
 
     onUseMIDIChanged: {
         updateFooterPage()
     }
 
-    function updateFooterPage() {
-        if (!footerDeck().validateFooterPage(footerPage.value)) {
-            footerDeck().defaultFooterPage()
-        }
-    }
+    // updateFooterPage function moved earlier (see above)
 
 /*
     //Bottom overlay should pop-up when Slot Parameters are being modified (S5 ONLY)

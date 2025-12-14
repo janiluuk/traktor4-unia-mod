@@ -2,7 +2,7 @@ import CSI 1.0
 
 Module {
     id: module
-    property string surface: "hw.mixer"
+    property string surface: "s5"
     property bool shift: false
 
     //Channels
@@ -49,7 +49,9 @@ Module {
     //Master Clock
     AppProperty { id: masterId; path: "app.traktor.masterclock.source_id" }
     AppProperty { id: clockBpm; path: "app.traktor.masterclock.tempo" }
-    AppProperty { id: deckBpm; path: "app.traktor.decks." + (masterId.value+1) + ".tempo.adjust_bpm" }
+    // Use safe path: if masterId is -1 (MasterClock), use deck 1 as fallback to prevent invalid path "app.traktor.decks.0.tempo.adjust_bpm"
+    property int masterDeckId: (masterId.value >= 0) ? (masterId.value + 1) : 1
+    AppProperty { id: deckBpm; path: "app.traktor.decks." + masterDeckId + ".tempo.adjust_bpm" }
     Wire { from: "%surface%.tempo"; to: EncoderScriptAdapter { onIncrement: clockBpm.value = clockBpm.value + stepBpm.value; onDecrement: clockBpm.value = clockBpm.value - stepBpm.value } enabled: !shift && masterId.value < 0 }
     Wire { from: "%surface%.tempo"; to: EncoderScriptAdapter { onIncrement: clockBpm.value = clockBpm.value + stepShiftBpm.value; onDecrement: clockBpm.value = clockBpm.value - stepShiftBpm.value } enabled: shift && masterId.value < 0 }
     Wire { from: "%surface%.tempo"; to: EncoderScriptAdapter { onIncrement: deckBpm.value = deckBpm.value + stepBpm.value; onDecrement: deckBpm.value = deckBpm.value - stepBpm.value } enabled: !shift && masterId.value >= 0 }

@@ -46,7 +46,6 @@ Item {
 
     MappingProperty { id: perfectTempoMatchLimit; path: "mapping.settings.perfectTempoMatchLimit"; onValueChanged: {updateSettings(firstIndex, secondIndex, thirdIndex, 0, 0)} }
     MappingProperty { id: regularTempoMatchLimit; path: "mapping.settings.regularTempoMatchLimit"; onValueChanged: {updateSettings(firstIndex, secondIndex, thirdIndex, 0, 0)} }
-    MappingProperty { id: invertMenuNavigation; path: propertiesPath + ".invertMenuNavigation" }
 
 //------------------------------------------------------------------------------------------------------------------
 // EDITOR STATE PROPERTIES
@@ -165,7 +164,7 @@ Item {
     property int prePreferencesNavMenuValue: 0
     MappingProperty { id: settingsNavigation; path: propertiesPath + ".preferencesNavigation";
         onValueChanged: {
-            var delta = (settingsNavigation.value - prePreferencesNavMenuValue) * (invertMenuNavigation.value ? -1 : 1);
+            var delta = settingsNavigation.value - prePreferencesNavMenuValue;
             prePreferencesNavMenuValue = settingsNavigation.value;
             if (thirdIndex != 0 && !integerEditor.value) {
                 var btn = settingsGrid.currentIndex;
@@ -758,7 +757,7 @@ Item {
                     else {
                         dataNames = ["Disabled" , "Enabled"]
                         highlightText = [!brightMode.value, brightMode.value]
-                        descriptionText = ["For club/dimm ambient sets", "(BETA) For daylight sets"]
+                        descriptionText = ["For club/dimm ambient sets", "For daylight sets"]
                     }
                 }
                 //Top Left Corner
@@ -1158,16 +1157,6 @@ Item {
                     }
                 }
                 else if (thirdIndex == (isTraktorD2 ? 5 : 6)) {
-                    if (info == 1) return dataNames[index]
-                    else if (info == 2) return highlightText[index]
-                    else if (info == 3) return descriptionText[index]
-                    else {
-                        dataNames = ["Normal Ordering", "Inverted Ordering"]
-                        highlightText = [!invertMenuNavigation.value, invertMenuNavigation.value]
-                        descriptionText = ["Menu navigation increments downward", "Menu navigation increments upward (inverted)"]
-                    }
-                }
-                else if (thirdIndex == (isTraktorD2 ? 6 : 7)) {
                     if (info == 1) return dataNames[index]
                     else if (info == 2) return highlightText[index]
                     else if (info == 3) return descriptionText[index]
@@ -1716,12 +1705,8 @@ Item {
                     if (currentIndex == 0) globalShiftEnabled.value = false
                     else if (currentIndex == 1) globalShiftEnabled.value = true
                 }
-                //Invert menu ordering
-                else if (thirdIndex == (isTraktorD2 ? 5 : 6)) {
-                    invertMenuNavigation.value = currentIndex == 1
-                }
                 //Return to top
-                else if (thirdIndex == (isTraktorD2 ? 6 : 7)) {
+                else if (thirdIndex == (isTraktorD2 ? 5 : 6)) {
                     firstIndex = 0
                     secondIndex = 0
                     thirdIndex = 0

@@ -5,7 +5,7 @@ import "../../Defines"
 
 Module {
     id: channel
-    property int deckId
+    property int deckId: 1  // Default to 1 to prevent invalid paths
     property string surface: "hw.mixer.channels.X"
 
     //Deck properties

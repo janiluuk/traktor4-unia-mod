@@ -101,7 +101,6 @@ Item {
   MappingProperty { id: traktorRelatedBrowser; path: "mapping.settings.traktorRelatedBrowser" }
   MappingProperty { id: autoZoomTPwaveform; path: "mapping.settings.autoZoomTPwaveform" }
   MappingProperty { id: onlyFocusedDeck; path: "mapping.settings.onlyFocusedDeck" }
-  MappingProperty { id: invertMenuNavigation; path: propertiesPath + ".invertMenuNavigation" }
 
 //------------------------------------------------------------------------------------------------------------------
 // DISPLAY SETTINGS
@@ -319,7 +318,7 @@ Item {
   property int prePreferencesNavMenuValue: 0
   MappingProperty { id: settingsNavigation; path: propertiesPath + ".preferencesNavigation";
     onValueChanged: {
-        var delta = (settingsNavigation.value - prePreferencesNavMenuValue) * (invertMenuNavigation.value ? -1 : 1);
+        var delta = settingsNavigation.value - prePreferencesNavMenuValue;
         prePreferencesNavMenuValue = settingsNavigation.value;
         if (thirdIndex != 0 && !integerEditor.value) {
             var btn = settingsGrid.currentIndex;
@@ -1093,19 +1092,8 @@ Item {
                     descriptionText = ["Shift functions for Left/Right sides of the controller will only work if the focused side 'shift' is held", "Shift functions for Left/Right sides of the controller will work if any 'shift' is held"]
                 }
             }
-            //Invert menu ordering
-            else if (thirdIndex == 6) {
-                if (info == 1) return dataNames[index]
-                else if (info == 2) return highlightText[index]
-                else if (info == 3) return descriptionText[index]
-                else {
-                    dataNames = ["Normal Ordering", "Inverted Ordering"]
-                    highlightText = [!invertMenuNavigation.value, invertMenuNavigation.value]
-                    descriptionText = ["Menu navigation increments downward", "Menu navigation increments upward (inverted)"]
-                }
-            }
             //Return to top
-            else if (thirdIndex == 7) {
+            else if (thirdIndex == 6) {
                 if (info == 1) return dataNames[index]
                 else if (info == 2) return highlightText[index]
                 else if (info == 3) return descriptionText[index]
@@ -1531,12 +1519,8 @@ Item {
                 if (currentIndex == 0) globalShiftEnabled.value = false
                 else if (currentIndex == 1) globalShiftEnabled.value = true
             }
-            //Invert menu ordering
-            else if (thirdIndex == 6) {
-                invertMenuNavigation.value = currentIndex == 1
-            }
             //Return to top
-            else if (thirdIndex == 7) {
+            else if (thirdIndex == 6) {
                 firstIndex = 0
                 secondIndex = 0
                 thirdIndex = 0

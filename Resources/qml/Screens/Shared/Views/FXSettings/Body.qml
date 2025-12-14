@@ -33,12 +33,14 @@ Item {
     AppProperty { id: patternPlayerEnabled; path: "app.traktor.settings.pro.plus.pattern_player" }
     
     // Only create AppProperty path when unit and activeTab are valid (>= 1 for unit, >= 0 for activeTab)
-    property string fxSelectListPath: (unit >= 1 && activeTab >= 0) ? ("app.traktor.fx." + unit + ".select." + Math.max(1, activeTab)) : ""
+    // Use a safe default path (fx unit 1, select 1) when values aren't ready to prevent crashes
+    property string fxSelectListPath: (unit >= 1 && activeTab >= 0) ? ("app.traktor.fx." + unit + ".select." + Math.max(1, activeTab)) : "app.traktor.fx.1.select.1"
     AppProperty { 
         id: fxSelectList
         path: fxSelectListPath
         onValueChanged: {
-            if (fxList && fxSelectList.value !== undefined && fxSelectList.value >= 0) {
+            // Only update if we have a valid path and the list exists
+            if (unit >= 1 && activeTab >= 0 && fxList && fxSelectList.value !== undefined && fxSelectList.value >= 0) {
                 fxList.currentIndex = fxSelectList.value
             }
         }
