@@ -434,17 +434,20 @@ FullscreenOverlay {
 
     MappingProperty { id: settingsPush; path: propertiesPath + ".preferencesPush";
         onValueChanged: {
-            if (firstIndex == 0 && settingsPush.value) {
-                // Toggle recording when push button is pressed on main menu
-                mixRecorderRecording.value = !mixRecorderRecording.value
-                // Also allow normal navigation
-                firstIndex = firstSettingsList.currentIndex+1; backBright.value = true
-            }
-            else if (firstIndex == 0) {firstIndex = firstSettingsList.currentIndex+1; backBright.value = true}
-            else if (secondIndex == 0) secondIndex = secondSettingsList.currentIndex+1;
-            else if (thirdIndex == 0) {thirdIndex = thirdSettingsList.currentIndex+1; settingsGrid.updateSettings(firstIndex, secondIndex, thirdIndex, 0, 0)}
-            else {
-                settingsGrid.updateSettingsParameters(firstIndex, secondIndex, thirdIndex)
+            if (settingsPush.value) {
+                if (firstIndex == 0) {
+                    // Navigate to selected menu item
+                    firstIndex = firstSettingsList.currentIndex+1; backBright.value = true
+                }
+                else if (secondIndex == 0) {
+                    secondIndex = secondSettingsList.currentIndex+1;
+                }
+                else if (thirdIndex == 0) {
+                    thirdIndex = thirdSettingsList.currentIndex+1; settingsGrid.updateSettings(firstIndex, secondIndex, thirdIndex, 0, 0)
+                }
+                else {
+                    settingsGrid.updateSettingsParameters(firstIndex, secondIndex, thirdIndex)
+                }
             }
         }
     }

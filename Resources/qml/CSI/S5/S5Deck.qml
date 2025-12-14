@@ -11,24 +11,19 @@ Module {
     property int deckId: 1
     property string surface: "path"
     property bool enablePads: false
-
-    // Properties that should be passed from parent or have safe defaults
-    property string settingsPath: "mapping.settings"
-    property string propertiesPath: "mapping.state"
-    property int footerId: deckId  // Default to deckId if not provided
-    property int remixId: deckId    // Default to deckId if not provided
-    property var activePadsMode     // Should be passed from parent
-    property var screenView          // Should be passed from parent
-    property var updateFooterPage   // Should be passed from parent (function reference)
+    property bool shift: false
+    
+    property var screenViewProp: null
+    property int focusedDeckId: 1
 
     property alias deckType: deckType.value
     property alias padsMode: padsMode.value
 
-    //Helper properties - use safe defaults if parent properties aren't available
-    property string deckSettingsPath: (settingsPath ? settingsPath : "mapping.settings") + "." + deckId
-    property string deckPropertiesPath: (propertiesPath ? propertiesPath : "mapping.state") + "." + deckId
-    property bool footerControlled: (footerId !== undefined) ? (footerId == deckId) : false
-    property bool remixControlled: (remixId !== undefined) ? (remixId == deckId) : false
+    //Helper properties
+    property string deckSettingsPath: settingsPath + "." + deckId
+    property string deckPropertiesPath: propertiesPath + "." + deckId
+    property bool footerControlled: footerId == deckId
+    property bool remixControlled: remixId == deckId
 
 //------------------------------------------------------------------------------------------------------------------
 // APP PROPERTIES
@@ -37,35 +32,28 @@ Module {
     //State properties
     AppProperty { id: directThru; path: "app.traktor.decks." + deckId + ".direct_thru";
         onValueChanged: {
-            if (active && directThru.value && activePadsMode) activePadsMode.value = PadsMode.disabled
-            else if (remixControlled && activePadsMode && (activePadsMode.value == PadsMode.remix || activePadsMode.value == PadsMode.legacyRemix) && directThru.value) {
-                // Use defaultPadsMode from this deck instead of calling parent's focusedDeck()
-                var defaultMode = defaultPadsMode();
-                if (defaultMode !== undefined && activePadsMode) activePadsMode.value = defaultMode;
-            }
-            else if (active && !directThru.value && activePadsMode) activePadsMode.value = padsMode.value //defaultPadsMode()
-            // Note: updatePads() is called through parent scope if available
-            // If not available, this will be a no-op (safe)
+            if (active && directThru.value) activePadsMode.value = PadsMode.disabled
+            else if (remixControlled && (activePadsMode.value == PadsMode.remix || activePadsMode.value == PadsMode.legacyRemix) && directThru.value) activePadsMode.value = focusedDeck().defaultPadsMode()
+            else if (active && !directThru.value) activePadsMode.value = padsMode.value //defaultPadsMode()
+            else { updatePads() }
         }
     }
     AppProperty { id: deckType; path: "app.traktor.decks." + deckId + ".type";
         onValueChanged: {
-            if (active && activePadsMode) {
+            if (active) {
                 activePadsMode.value = defaultPadsMode()
             }
-            // Call updatePads if available (from parent scope)
-            if (typeof updatePads === 'function') updatePads()
-            if (typeof updateFooterPage === 'function') updateFooterPage()
+            updatePads()
+            updateFooterPage()
         }
     }
     AppProperty { path: "app.traktor.decks." + deckId + ".is_loaded_signal";
         onValueChanged: {
-            if (screenView && screenView.value == ScreenView.browser) {
-                screenView.value = ScreenView.deck
-                if (active && activePadsMode) { activePadsMode.value = defaultPadsMode() } //TO-DO: add option to reset pads mode on load
-                // Call updatePads if available (from parent scope)
-                if (typeof updatePads === 'function') updatePads()
-                if (typeof updateFooterPage === 'function') updateFooterPage()
+            if (screenViewProp && screenViewProp.value == ScreenView.browser) {
+                screenViewProp.value = ScreenView.deck
+                if (active) { activePadsMode.value = defaultPadsMode() } //TO-DO: add option to reset pads mode on load
+                updatePads()
+                updateFooterPage()
             }
         }
     }
@@ -215,7 +203,7 @@ Module {
     MappingPropertyDescriptor { id: remixPadsControl; path: deckPropertiesPath + ".remixPadsControl"; type: MappingPropertyDescriptor.Integer; value: 1; min: 1; max: 8 }
 
     //Sequencer Properties
-    MappingPropertyDescriptor { id: sequencerMode; path: deckPropertiesPath + ".sequencerMode"; type: MappingPropertyDescriptor.Boolean; value: false; onValueChanged: { if (typeof updateFooterPage === 'function') updateFooterPage() } }
+    MappingPropertyDescriptor { id: sequencerMode; path: deckPropertiesPath + ".sequencerMode"; type: MappingPropertyDescriptor.Boolean; value: false; onValueChanged: { updateFooterPage() } }
     MappingPropertyDescriptor { id: sequencerSlot; path: deckPropertiesPath + ".sequencerSlot"; type: MappingPropertyDescriptor.Integer; value: 1; min: 1; max: 4 }
     MappingPropertyDescriptor { id: sequencerPage; path: deckPropertiesPath + ".sequencerPage"; type: MappingPropertyDescriptor.Integer; value: 1; min: 1; max: 2 }
     MappingPropertyDescriptor { id: sequencerSampleLockSlot1; path: deckPropertiesPath + ".sequencerSampleLockSlot1"; type: MappingPropertyDescriptor.Boolean; value: false }
@@ -323,6 +311,8 @@ Module {
         active: deck.active
         deckId: deck.deckId
         surface: deck.surface
+        screenViewProp: deck.screenViewProp
+        focusedDeckId: deck.focusedDeckId
     }
 
     S5LoopEncoder {
@@ -330,6 +320,7 @@ Module {
         active: deck.active //(deck.active && !focusedHoldRemix) || (remixId == deck.deckId && focusedHoldRemix)
         deckId: deck.deckId
         surface: deck.surface
+        shift: deck.shift
     }
 
 //------------------------------------------------------------------------------------------------------------------
@@ -423,11 +414,12 @@ Module {
         name: "padsModeButtons"
         deckId: deck.deckId
         surface: deck.surface
+        shift: deck.shift
     }
 
     HotcuesMode {
         name: "hotcuesMode"
-        active: (activePadsMode && activePadsMode.value == PadsMode.hotcues) && enablePads
+        active: activePadsMode.value == PadsMode.hotcues && enablePads
         deckId: deck.deckId
         surface: deck.surface
     }
@@ -472,7 +464,7 @@ Module {
         active: activePadsMode.value == PadsMode.legacyRemix && enablePads
         deckId: deck.deckId
         surface: deck.surface
-        browsing: (screenView && screenView.value == ScreenView.browser)
+        browsing: screenViewProp && screenViewProp.value == ScreenView.browser
     }
 
     RemixMode {
@@ -480,7 +472,7 @@ Module {
         active: activePadsMode.value == PadsMode.remix && enablePads
         deckId: deck.deckId
         surface: deck.surface
-        browsing: (screenView && screenView.value == ScreenView.browser)
+        browsing: screenViewProp && screenViewProp.value == ScreenView.browser
     }
 
     SequencerMode {

@@ -7,8 +7,9 @@ Module {
     id: module
     property bool active: true
     property int deckId: 1 //1-4
-    property int focusedDeckId: deckId  // Default to deckId if not provided
     property string surface: "path"
+    property var screenViewProp: null
+    property int focusedDeckId: 1
 
     DeckTempo { name: "tempo"; channel: deckId }
     Loop { name: "loop"; channel: deckId }
@@ -28,14 +29,12 @@ Module {
     AppProperty { id: hotcueActive; path: selectedCuePath +  ".active" }
 
     //Warning message while browsing
-    // Use safe path: ensure focusedDeckId is valid (1-4) to prevent invalid paths
-    property int safeFocusedDeckId: (focusedDeckId >= 1 && focusedDeckId <= 4) ? focusedDeckId : deckId
-    AppProperty { id: deckLoadingWarning; path: "app.traktor.informer.deck_loading_warnings." + safeFocusedDeckId + ".active";
+    AppProperty { id: deckLoadingWarning; path: "app.traktor.informer.deck_loading_warnings." + focusedDeckId + ".active";
         onValueChanged:
-            if (screenView.value == ScreenView.browser && deckLoadingWarning.value) {
+            if (screenViewProp && screenViewProp.value == ScreenView.browser && deckLoadingWarning.value) {
                 screenOverlay.value = Overlay.browserWarnings
             }
-            else if (screenView.value == ScreenView.browser && !deckLoadingWarning.value) {
+            else if (screenViewProp && screenViewProp.value == ScreenView.browser && !deckLoadingWarning.value) {
                 screenOverlay.value = Overlay.none
             }
     }
@@ -57,7 +56,7 @@ Module {
 
         //Browser
         WiresGroup {
-            enabled: screenView.value == ScreenView.browser
+            enabled: screenViewProp && screenViewProp.value == ScreenView.browser
 
             //Navigation
             /*
@@ -91,19 +90,19 @@ Module {
 
             //Exit Browser holding Back
             Wire { from: "%surface%.back"; to: "BrowserBackTimer.input" }
-            Wire { from: "BrowserBackTimer.output"; to: SetPropertyAdapter { path: screenView.path; value: ScreenView.deck } }
+            Wire { from: "BrowserBackTimer.output"; to: SetPropertyAdapter { path: (screenViewProp ? screenViewProp.path : ""); value: ScreenView.deck } enabled: screenViewProp }
         }
         Wire { from: "%surface%.browse.touch"; to: HoldPropertyAdapter { path: browserIsTemporary.path; value: true } enabled: screenOverlay.value == Overlay.none && showBrowserOnTouch.value } //Can't be inside of screenView.value == ScreenView.deck because, otherwise, if you only hold the encoder, it won't keep the browser openned.
 
         //Deck
         WiresGroup {
-            enabled: screenView.value == ScreenView.deck
+            enabled: screenViewProp && screenViewProp.value == ScreenView.deck
 
             WiresGroup {
                 enabled: editMode.value != EditMode.full && !slotState.value
 
                 //Open Browser
-                Wire { from: "%surface%.browse.push"; to: ButtonScriptAdapter { onPress: { browserIsTemporary.value = false; screenView.value = ScreenView.browser } } enabled: !showBrowserOnTouch.value && screenOverlay.value == Overlay.none && !shift}
+                Wire { from: "%surface%.browse.push"; to: ButtonScriptAdapter { onPress: { browserIsTemporary.value = false; if (screenViewProp) screenViewProp.value = ScreenView.browser } } enabled: !showBrowserOnTouch.value && screenOverlay.value == Overlay.none && !shift && screenViewProp}
 
                 //Default Browse Encoder Mode (when Open Browser on Touch is disabled)
                 WiresGroup {
@@ -259,7 +258,7 @@ Module {
 
         //FX Settings
         WiresGroup {
-            enabled: screenView.value == ScreenView.fxSettings
+            enabled: screenViewProp && screenViewProp.value == ScreenView.fxSettings
 
             Wire { from: "%surface%.browse.turn"; to: RelativePropertyAdapter { path: propertiesPath + ".fxSettingsNavigation"; step: 1; mode: RelativeMode.Stepped } }
             Wire { from: "%surface%.browse.push"; to: TogglePropertyAdapter { path: propertiesPath + ".fxSettingsPush" } }
@@ -267,7 +266,7 @@ Module {
 
         //Settings
         WiresGroup {
-            enabled: screenView.value == ScreenView.settings
+            enabled: screenViewProp && screenViewProp.value == ScreenView.settings
 
             //Preferences Navigation
             Wire { from: "%surface%.browse.turn"; to: RelativePropertyAdapter { path: propertiesPath + ".preferencesNavigation"; step: 1; mode: RelativeMode.Stepped } }
@@ -364,7 +363,7 @@ Module {
         enabled: deck.footerControlled
 
         WiresGroup {
-            enabled: screenView.value == ScreenView.deck && editMode.value != EditMode.full
+            enabled: screenViewProp && screenViewProp.value == ScreenView.deck && editMode.value != EditMode.full
 
             //RMX Slots Volume Control
             WiresGroup {

@@ -8,6 +8,7 @@ Module {
     property bool active: true
     property int deckId: 1 //1-4
     property string surface: "path"
+    property bool shift: false
 
     // Ensure deckId is always valid (1-4) to prevent invalid AppProperty paths
     property int safeDeckId: (deckId >= 1 && deckId <= 4) ? deckId : 1
@@ -51,9 +52,9 @@ Module {
         WiresGroup {
             enabled: (typeof screenView !== 'undefined' && screenView && screenView.value == ScreenView.browser) && (typeof browserIsContentList !== 'undefined' && browserIsContentList && browserIsContentList.value)
 
-            Wire { from: "%surface%.encoder.push"; to: TriggerPropertyAdapter  { path:"app.traktor.browser.flip_sort_up_down" } enabled: ((typeof shift === 'undefined' || !shift || !shift.value) && (typeof loopEncoderInBrowser !== 'undefined' && loopEncoderInBrowser && loopEncoderInBrowser.value == 0)) || ((typeof shift !== 'undefined' && shift && shift.value) && (typeof shiftLoopEncoderInBrowser !== 'undefined' && shiftLoopEncoderInBrowser && shiftLoopEncoderInBrowser.value == 0)) && (browserSortId.value > 0) }
-            Wire { from: "%surface%.encoder"; to: RelativePropertyAdapter { path: (typeof seekPreviewPlayer !== 'undefined' && seekPreviewPlayer && seekPreviewPlayer.path) ? seekPreviewPlayer.path : ""; step: 0.01; mode: RelativeMode.Stepped } enabled: ((typeof seekPreviewPlayer !== 'undefined' && seekPreviewPlayer && seekPreviewPlayer.path) && (((typeof shift === 'undefined' || !shift || !shift.value) && (typeof loopEncoderInBrowser !== 'undefined' && loopEncoderInBrowser && loopEncoderInBrowser.value == 1)) || ((typeof shift !== 'undefined' && shift && shift.value) && (typeof shiftLoopEncoderInBrowser !== 'undefined' && shiftLoopEncoderInBrowser && shiftLoopEncoderInBrowser.value == 1)))) }
-            Wire { from: "%surface%.encoder.push"; to: TriggerPropertyAdapter   { path: "app.traktor.browser.preview_player.load_or_play" } enabled: ((typeof shift === 'undefined' || !shift || !shift.value) && (typeof loopEncoderInBrowser !== 'undefined' && loopEncoderInBrowser && loopEncoderInBrowser.value == 1)) || ((typeof shift !== 'undefined' && shift && shift.value) && (typeof shiftLoopEncoderInBrowser !== 'undefined' && shiftLoopEncoderInBrowser && shiftLoopEncoderInBrowser.value == 1)) }
+            Wire { from: "%surface%.encoder.push"; to: TriggerPropertyAdapter  { path:"app.traktor.browser.flip_sort_up_down" } enabled: ((typeof shift === 'undefined' || !shift) && (typeof loopEncoderInBrowser !== 'undefined' && loopEncoderInBrowser && loopEncoderInBrowser.value == 0)) || ((typeof shift !== 'undefined' && shift) && (typeof shiftLoopEncoderInBrowser !== 'undefined' && shiftLoopEncoderInBrowser && shiftLoopEncoderInBrowser.value == 0)) && (browserSortId.value > 0) }
+            Wire { from: "%surface%.encoder"; to: RelativePropertyAdapter { path: (typeof seekPreviewPlayer !== 'undefined' && seekPreviewPlayer && seekPreviewPlayer.path) ? seekPreviewPlayer.path : ""; step: 0.01; mode: RelativeMode.Stepped } enabled: ((typeof seekPreviewPlayer !== 'undefined' && seekPreviewPlayer && seekPreviewPlayer.path) && (((typeof shift === 'undefined' || !shift) && (typeof loopEncoderInBrowser !== 'undefined' && loopEncoderInBrowser && loopEncoderInBrowser.value == 1)) || ((typeof shift !== 'undefined' && shift) && (typeof shiftLoopEncoderInBrowser !== 'undefined' && shiftLoopEncoderInBrowser && shiftLoopEncoderInBrowser.value == 1)))) }
+            Wire { from: "%surface%.encoder.push"; to: TriggerPropertyAdapter   { path: "app.traktor.browser.preview_player.load_or_play" } enabled: ((typeof shift === 'undefined' || !shift) && (typeof loopEncoderInBrowser !== 'undefined' && loopEncoderInBrowser && loopEncoderInBrowser.value == 1)) || ((typeof shift !== 'undefined' && shift) && (typeof shiftLoopEncoderInBrowser !== 'undefined' && shiftLoopEncoderInBrowser && shiftLoopEncoderInBrowser.value == 1)) }
         }
 
         //Deck
@@ -67,12 +68,12 @@ Module {
                 WiresGroup {
                     enabled: (typeof holdFreeze === 'undefined' || !holdFreeze || !holdFreeze.value) && (typeof sequencerMode === 'undefined' || !sequencerMode || !sequencerMode.value) && (typeof holdRemix === 'undefined' || !holdRemix || !holdRemix.value) && (typeof holdDeck === 'undefined' || !holdDeck || !holdDeck.value) && (typeof loopInAdjust === 'undefined' || !loopInAdjust || !loopInAdjust.value) && (typeof loopOutAdjust === 'undefined' || !loopOutAdjust || !loopOutAdjust.value)
 
-                    Wire { from: "%surface%.encoder"; to: "loop.autoloop"; enabled: typeof shift === 'undefined' || !shift || !shift.value }
-                    Wire { from: "%surface%.encoder"; to: "loop.move"; enabled: typeof shift !== 'undefined' && shift && shift.value }
+                    Wire { from: "%surface%.encoder"; to: "loop.autoloop"; enabled: typeof shift === 'undefined' || !shift }
+                    Wire { from: "%surface%.encoder"; to: "loop.move"; enabled: typeof shift !== 'undefined' && shift }
                     Wire { from: "loop.active"; to: "%surface%.loop.led" }
 
                     Wire {
-                        enabled: typeof shift === 'undefined' || !shift || !shift.value
+                        enabled: typeof shift === 'undefined' || !shift
                         from: Or {
                             inputs:
                             [
@@ -138,8 +139,8 @@ Module {
                 //Sequencer State --> Pattern Length
                 WiresGroup {
                     enabled: (typeof sequencerMode !== 'undefined' && sequencerMode && sequencerMode.value)
-                    Wire { from: "%surface%.encoder.turn"; to: "remix_sequencer.selected_slot_pattern_length"; enabled: typeof shift === 'undefined' || !shift || !shift.value } //FIX TO EDIT SLOTS 2-4 ("app.traktor.decks.X.remix.players.Y.sequencer.pattern_length")
-                    Wire { from: "%surface%.encoder.turn"; to: "remix_sequencer.all_slots_pattern_length"; enabled: typeof shift !== 'undefined' && shift && shift.value }
+                    Wire { from: "%surface%.encoder.turn"; to: "remix_sequencer.selected_slot_pattern_length"; enabled: typeof shift === 'undefined' || !shift } //FIX TO EDIT SLOTS 2-4 ("app.traktor.decks.X.remix.players.Y.sequencer.pattern_length")
+                    Wire { from: "%surface%.encoder.turn"; to: "remix_sequencer.all_slots_pattern_length"; enabled: typeof shift !== 'undefined' && shift }
                     Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".remix.sequencer.on" } }
                     Wire { from: "loop_encoder_sequencer_blinker"; to: "%surface%.loop.led" }
                     Wire { from: "loop_encoder_sequencer_blinker.trigger"; to: ExpressionAdapter { type: ExpressionAdapter.Boolean; expression: (sequencerOn && sequencerOn.value) ? true : false } }
@@ -155,13 +156,13 @@ Module {
 
                 WiresGroup {
                     enabled: (typeof zoomedEditView === 'undefined' || !zoomedEditView || !zoomedEditView.value) && (typeof encoderScanMode === 'undefined' || !encoderScanMode || !encoderScanMode.value)
-                    Wire { from: "%surface%.encoder.turn"; to: "grid.offset_coarse"; enabled: typeof shift === 'undefined' || !shift || !shift.value }
-                    Wire { from: "%surface%.encoder.turn"; to: "grid.offset_fine"; enabled: typeof shift !== 'undefined' && shift && shift.value }
+                    Wire { from: "%surface%.encoder.turn"; to: "grid.offset_coarse"; enabled: typeof shift === 'undefined' || !shift }
+                    Wire { from: "%surface%.encoder.turn"; to: "grid.offset_fine"; enabled: typeof shift !== 'undefined' && shift }
                 }
                 WiresGroup {
                     enabled: (typeof zoomedEditView !== 'undefined' && zoomedEditView && zoomedEditView.value) && (typeof encoderScanMode === 'undefined' || !encoderScanMode || !encoderScanMode.value)
-                    Wire { from: "%surface%.encoder.turn"; to: "grid.offset_fine"; enabled: typeof shift === 'undefined' || !shift || !shift.value }
-                    Wire { from: "%surface%.encoder.turn"; to: "grid.offset_ultrafine"; enabled: typeof shift !== 'undefined' && shift && shift.value }
+                    Wire { from: "%surface%.encoder.turn"; to: "grid.offset_fine"; enabled: typeof shift === 'undefined' || !shift }
+                    Wire { from: "%surface%.encoder.turn"; to: "grid.offset_ultrafine"; enabled: typeof shift !== 'undefined' && shift }
                 }
             }
         }
@@ -293,9 +294,9 @@ Module {
                         //enabled: performanceEncoderControls.value == 2
 
                         Wire { from: "%surface%.encoder.turn"; to: RelativePropertyAdapter { path: deckPath + ".stems.1.filter_value"; step: 0.025; mode: RelativeMode.Stepped } }
-                        Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".stems.1.filter_on" } enabled: typeof shift === 'undefined' || !shift || !shift.value }
+                        Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".stems.1.filter_on" } enabled: typeof shift === 'undefined' || !shift }
                         WiresGroup {
-                            enabled: typeof shift !== 'undefined' && shift && shift.value
+                            enabled: typeof shift !== 'undefined' && shift
                             Wire { from: "%surface%.encoder.push"; to: (typeof reset_stems !== 'undefined' && reset_stems) ? "reset_stems.1.filter" : "" }
                             Wire { from: "%surface%.encoder.push"; to: (typeof reset_stems !== 'undefined' && reset_stems) ? "reset_stems.1.filter_on" : "" }
                         }
@@ -310,9 +311,9 @@ Module {
                         //enabled: performanceEncoderControls.value == 2
 
                         Wire { from: "%surface%.encoder.turn"; to: RelativePropertyAdapter { path: deckPath + ".stems.2.filter_value"; step: 0.025; mode: RelativeMode.Stepped } }
-                        Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".stems.2.filter_on" } enabled: typeof shift === 'undefined' || !shift || !shift.value }
+                        Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".stems.2.filter_on" } enabled: typeof shift === 'undefined' || !shift }
                         WiresGroup {
-                            enabled: typeof shift !== 'undefined' && shift && shift.value
+                            enabled: typeof shift !== 'undefined' && shift
                             Wire { from: "%surface%.encoder.push"; to: (typeof reset_stems !== 'undefined' && reset_stems) ? "reset_stems.2.filter" : "" }
                             Wire { from: "%surface%.encoder.push"; to: (typeof reset_stems !== 'undefined' && reset_stems) ? "reset_stems.2.filter_on" : "" }
                         }
@@ -327,9 +328,9 @@ Module {
                         //enabled: performanceEncoderControls.value == 2
 
                         Wire { from: "%surface%.encoder.turn"; to: RelativePropertyAdapter { path: deckPath + ".stems.3.filter_value"; step: 0.025; mode: RelativeMode.Stepped } }
-                        Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".stems.3.filter_on" } enabled: typeof shift === 'undefined' || !shift || !shift.value }
+                        Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".stems.3.filter_on" } enabled: typeof shift === 'undefined' || !shift }
                         WiresGroup {
-                            enabled: typeof shift !== 'undefined' && shift && shift.value
+                            enabled: typeof shift !== 'undefined' && shift
                             Wire { from: "%surface%.encoder.push"; to: (typeof reset_stems !== 'undefined' && reset_stems) ? "reset_stems.3.filter" : "" }
                             Wire { from: "%surface%.encoder.push"; to: (typeof reset_stems !== 'undefined' && reset_stems) ? "reset_stems.3.filter_on" : "" }
                         }
@@ -344,9 +345,9 @@ Module {
                         //enabled: performanceEncoderControls.value == 2
 
                         Wire { from: "%surface%.encoder.turn"; to: RelativePropertyAdapter { path: deckPath + ".stems.4.filter_value"; step: 0.025; mode: RelativeMode.Stepped } }
-                        Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".stems.4.filter_on" } enabled: typeof shift === 'undefined' || !shift || !shift.value }
+                        Wire { from: "%surface%.encoder.push"; to: TogglePropertyAdapter { path: deckPath + ".stems.4.filter_on" } enabled: typeof shift === 'undefined' || !shift }
                         WiresGroup {
-                            enabled: typeof shift !== 'undefined' && shift && shift.value
+                            enabled: typeof shift !== 'undefined' && shift
                             Wire { from: "%surface%.encoder.push"; to: (typeof reset_stems !== 'undefined' && reset_stems) ? "reset_stems.4.filter" : "" }
                             Wire { from: "%surface%.encoder.push"; to: (typeof reset_stems !== 'undefined' && reset_stems) ? "reset_stems.4.filter_on" : "" }
                         }

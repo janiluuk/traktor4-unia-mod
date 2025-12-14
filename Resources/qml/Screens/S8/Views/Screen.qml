@@ -78,6 +78,15 @@ Item {
         }
     }
 
+    onPropertiesPathChanged: {
+        // Update isLeftScreen when propertiesPath changes (important for KontrolScreen)
+        if (propertiesPath !== "" && propertiesPath.indexOf(".right") !== -1) {
+            isLeftScreen = false
+        } else if (propertiesPath !== "" && propertiesPath.indexOf(".left") !== -1) {
+            isLeftScreen = true
+        }
+    }
+
     onIsLeftScreenChanged: {
         if (!pathsProvided) {
             settingsPath = isLeftScreen ? "mapping.settings.left" : "mapping.settings.right"
@@ -469,8 +478,8 @@ Item {
     MappingProperty { id: showFX2; path: "mapping.state.showFX2" }
     MappingProperty { id: showFX3; path: "mapping.state.showFX3" }
     MappingProperty { id: showFX4; path: "mapping.state.showFX4" }
-    property bool topFXPanel: topFXOverlay.value || (showFX1.value && topFXUnit.value == 1) || (showFX2.value && topFXUnit.value == 2) || (showFX3.value && topFXUnit.value == 3) || (showFX4.value && topFXUnit.value == 4)
-    property bool bottomFXPanel: bottomPerformanceOverlay.value || (showFX1.value && bottomFXUnit.value == 1) || (showFX2.value && bottomFXUnit.value == 2) || (showFX3.value && bottomFXUnit.value == 3) || (showFX4.value && bottomFXUnit.value == 4)
+    property bool topFXPanel: topFXOverlay.value || (showFX1.value && (topFXUnit ? (topFXUnit.value == 1) : false)) || (showFX2.value && (topFXUnit ? (topFXUnit.value == 2) : false)) || (showFX3.value && (topFXUnit ? (topFXUnit.value == 3) : false)) || (showFX4.value && (topFXUnit ? (topFXUnit.value == 4) : false))
+    property bool bottomFXPanel: bottomPerformanceOverlay.value || (showFX1.value && (bottomFXUnit ? (bottomFXUnit.value == 1) : false)) || (showFX2.value && (bottomFXUnit ? (bottomFXUnit.value == 2) : false)) || (showFX3.value && (bottomFXUnit ? (bottomFXUnit.value == 3) : false)) || (showFX4.value && (bottomFXUnit ? (bottomFXUnit.value == 4) : false))
 
     MappingProperty { id: footerPage;  path: propertiesPath + ".footer_page" }
     MappingProperty { id: footerHasContent; path: propertiesPath + ".footerHasContent" }

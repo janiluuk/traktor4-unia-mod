@@ -45,7 +45,17 @@ Item {
             }
         }
     }
-    property var fxUnit: (fxSettingsTab && fxSettingsTab.value) ? (fxSettingsTab.value <= 4 ? (topFXUnit ? topFXUnit : null) : (bottomFXUnit ? bottomFXUnit : null)) : null
+    // fxUnit is computed from topFXUnit/bottomFXUnit based on the active tab
+    // Use a function to compute it when needed, not as a binding to avoid loops
+    function getFxUnit() {
+        if (!fxSettingsTab || !fxSettingsTab.value) return null
+        return (fxSettingsTab.value <= 4) ? topFXUnit : bottomFXUnit
+    }
+    // Use a property that updates only when fxSettingsTab changes, not when fxUnit properties change
+    property var fxUnit: getFxUnit()
+    onFxSettingsTabChanged: {
+        fxUnit = getFxUnit()
+    }
 
     //FX Settings View
     Item {
@@ -331,9 +341,10 @@ Item {
         delegate:
             Item {
             id: contactDelegate
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.left: parent ? parent.left : undefined
+            anchors.right: parent ? parent.right : undefined
             height: delegateHeight // item (= line) height
-            width: parent.width
+            width: parent ? parent.width : 0
 
             property bool isCurrentItem: ListView.isCurrentItem
             readonly property bool isMacroFx: (modelData.charCodeAt(0) == macroEffectChar)

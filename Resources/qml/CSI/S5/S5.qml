@@ -68,9 +68,6 @@ Mapping {
         surface: "s5.left"
         settingsPath: "mapping.settings.left"
         propertiesPath: "mapping.state.left"
-        onlyFocusedDeck: onlyFocusedDeck.value
-        stemResetOnLoad: stemResetOnLoad.value
-        stemSelectorModeHold: stemSelectorModeHold.value
     }
 
     S5Side {
@@ -81,9 +78,6 @@ Mapping {
         surface: "s5.right"
         settingsPath: "mapping.settings.right"
         propertiesPath: "mapping.state.right"
-        onlyFocusedDeck: onlyFocusedDeck.value
-        stemResetOnLoad: stemResetOnLoad.value
-        stemSelectorModeHold: stemSelectorModeHold.value
     }
     
     Mixer {
@@ -101,41 +95,45 @@ Mapping {
     MappingPropertyDescriptor { id: leftFocusedDeckId; path: "mapping.state.leftFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: left.focusedDeckId }
     MappingPropertyDescriptor { id: rightFocusedDeckId; path: "mapping.state.rightFocusedDeckId"; type: MappingPropertyDescriptor.Integer; value: right.focusedDeckId }
 
-    property bool leftScreenViewValue: left.screenView.value
-    property bool rightScreenViewValue: right.screenView.value
+    //Keep focused deck ids aligned with the currently active layer
+    Binding { target: leftFocusedDeckId; property: "value"; value: left.focusedDeckId }
+    Binding { target: rightFocusedDeckId; property: "value"; value: right.focusedDeckId }
+
+    property bool leftScreenViewValue: left.screenView
+    property bool rightScreenViewValue: right.screenView
 
     onLeftScreenViewValueChanged: {
-        if (left.screenView.value == ScreenView.browser) {
+        if (left.screenViewProp.value == ScreenView.browser) {
             if (traktorRelatedBrowser.value) {
                 fullscreenBrowser.value = true
             }
-            if (!independentScreenBrowser.value && right.screenView.value == ScreenView.browser) {
-                right.screenView.value = ScreenView.deck
+            if (!independentScreenBrowser.value && right.screenViewProp.value == ScreenView.browser) {
+                right.screenViewProp.value = ScreenView.deck
             }
         }
-        else if (left.screenView.value == ScreenView.deck) {
-            if (traktorRelatedBrowser.value && right.screenView.value == ScreenView.deck) {
+        else if (left.screenViewProp.value == ScreenView.deck) {
+            if (traktorRelatedBrowser.value && right.screenViewProp.value == ScreenView.deck) {
                 fullscreenBrowser.value = false
             }
-            if (right.screenView.value != ScreenView.browser) {
+            if (right.screenViewProp.value != ScreenView.browser) {
                 unloadPreviewPlayer.value = true
             }
         }
     }
     onRightScreenViewValueChanged: {
-        if (right.screenView.value == ScreenView.browser) {
+        if (right.screenViewProp.value == ScreenView.browser) {
             if (traktorRelatedBrowser.value) {
                 fullscreenBrowser.value = true
             }
-            if (!independentScreenBrowser.value && left.screenView.value == ScreenView.browser) {
-                left.screenView.value = ScreenView.deck
+            if (!independentScreenBrowser.value && left.screenViewProp.value == ScreenView.browser) {
+                left.screenViewProp.value = ScreenView.deck
             }
         }
-        else if (right.screenView.value == ScreenView.deck) {
-            if (traktorRelatedBrowser.value && left.screenView.value == ScreenView.deck) {
+        else if (right.screenViewProp.value == ScreenView.deck) {
+            if (traktorRelatedBrowser.value && left.screenViewProp.value == ScreenView.deck) {
                 fullscreenBrowser.value = false
             }
-            if (left.screenView.value != ScreenView.browser) {
+            if (left.screenViewProp.value != ScreenView.browser) {
                 unloadPreviewPlayer.value = true
             }
         }
