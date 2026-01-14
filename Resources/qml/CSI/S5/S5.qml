@@ -4,6 +4,26 @@ import QtQuick 2.12
 import "../../Defines"
 import "../Common/Settings"
 
+//------------------------------------------------------------------------------------------------------------------
+// TRAKTOR KONTROL S5 CONTROLLER MAPPING
+//------------------------------------------------------------------------------------------------------------------
+// 
+// SCREEN IMPLEMENTATION NOTE:
+// The Traktor Kontrol S5 does not have dedicated screen QML files in Resources/qml/Screens/S5/.
+// Instead, the S5 shares screen implementations with the S4 MK3 controller, located in 
+// Resources/qml/Screens/S4MK3/. This is intentional and works correctly because:
+//
+// 1. Both S5 and S4 MK3 have similar screen hardware capabilities and display dimensions
+// 2. The same visual themes (Original, OriginalPro, UNIA) work well on both controllers
+// 3. All overlays, browser views, and deck displays are fully compatible
+// 4. Theme settings (lines 247-248) control which S4MK3 screen variant is displayed on S5
+//
+// This screen-sharing approach reduces code duplication while maintaining full functionality.
+// If S5-specific screen optimizations are needed in the future, create Resources/qml/Screens/S5/
+// and Traktor's CSI system will automatically use those instead of S4MK3 screens.
+//
+//------------------------------------------------------------------------------------------------------------------
+
 Mapping {
 
 //------------------------------------------------------------------------------------------------------------------
@@ -241,6 +261,11 @@ Mapping {
 
 //------------------------------------------------------------------------------------------------------------------
 // DISPLAY SETTINGS
+//------------------------------------------------------------------------------------------------------------------
+// NOTE: S5 uses S4 MK3 screen files (see top of file for explanation).
+// Theme settings below control which S4 MK3 theme variant is displayed on S5 screens:
+//   1: Original theme
+//   2-6: Other available S4 MK3 themes (OriginalPro, UNIA, etc.)
 //------------------------------------------------------------------------------------------------------------------
 
     //General

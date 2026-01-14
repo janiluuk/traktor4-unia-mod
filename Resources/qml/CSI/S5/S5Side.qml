@@ -67,7 +67,20 @@ Module {
     MappingPropertyDescriptor { id: stepTempoEditor; path: propertiesPath + ".stepTempo_editor"; type: MappingPropertyDescriptor.Boolean; value: false }
     MappingPropertyDescriptor { id: stepShiftTempoEditor; path: propertiesPath + ".stepShiftTempo_editor"; type: MappingPropertyDescriptor.Boolean; value: false }
 
-    //S8/D2 properties --> keep this to avoid the softtakrover faders to appear on the S5 Screen
+//------------------------------------------------------------------------------------------------------------------
+// S8/D2 SCREEN COMPATIBILITY PROPERTIES
+//------------------------------------------------------------------------------------------------------------------
+// These dummy properties prevent S8/D2-specific soft takeover fader overlays from appearing on S5 screens.
+// Since S5 shares S4 MK3 screen files, and those screens may reference properties that exist on S8/D2
+// but not on S5 hardware, we define them here with disabled/zero values. This ensures:
+//
+// 1. No QML warnings about missing properties when S4 MK3 screens are rendered on S5
+// 2. S8-specific overlays (soft takeover faders) remain hidden on S5
+// 3. Screen sharing between S5 and S4 MK3 works without modifications to screen files
+//
+// These properties have no effect on S5 functionality - they exist purely for screen compatibility.
+//------------------------------------------------------------------------------------------------------------------
+
     MappingPropertyDescriptor { path: propertiesPath + ".softtakeover.show_faders"; type: MappingPropertyDescriptor.Boolean; value: false }
 
     MappingPropertyDescriptor { path: propertiesPath + ".softtakeover.faders.1.active"; type: MappingPropertyDescriptor.Boolean; value: false }
