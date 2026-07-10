@@ -426,9 +426,9 @@ FullscreenOverlay {
     MappingProperty { id: backBright; path: propertiesPath + ".backBright" }
     MappingProperty { id: settingsBack; path: propertiesPath + ".preferencesBack";
         onValueChanged: {
-            if (thirdIndex != 0 && integerEditor.value == false) {thirdIndex = 0; settingsGrid.currentIndex = 0}
-            else if (secondIndex != 0 && thirdIndex == 0) secondIndex = 0;
-            else if (firstIndex != 0 && secondIndex == 0) {firstIndex = 0; backBright.value = false}
+            if (thirdIndex != 0 && integerEditor.value == false) {thirdSettingsList.selectedIndex = 0; settingsGrid.currentIndex = 0}
+            else if (secondIndex != 0 && thirdIndex == 0) secondSettingsList.selectedIndex = 0;
+            else if (firstIndex != 0 && secondIndex == 0) {firstSettingsList.selectedIndex = 0; backBright.value = false}
         }
     }
 
@@ -437,13 +437,13 @@ FullscreenOverlay {
             if (settingsPush.value) {
                 if (firstIndex == 0) {
                     // Navigate to selected menu item
-                    firstIndex = firstSettingsList.currentIndex+1; backBright.value = true
+                    firstSettingsList.selectedIndex = firstSettingsList.currentIndex+1; backBright.value = true
                 }
                 else if (secondIndex == 0) {
-                    secondIndex = secondSettingsList.currentIndex+1;
+                    secondSettingsList.selectedIndex = secondSettingsList.currentIndex+1;
                 }
                 else if (thirdIndex == 0) {
-                    thirdIndex = thirdSettingsList.currentIndex+1; settingsGrid.updateSettings(firstIndex, secondIndex, thirdIndex, 0, 0)
+                    thirdSettingsList.selectedIndex = thirdSettingsList.currentIndex+1; settingsGrid.updateSettings(firstIndex, secondIndex, thirdIndex, 0, 0)
                 }
                 else {
                     settingsGrid.updateSettingsParameters(firstIndex, secondIndex, thirdIndex)
