@@ -250,6 +250,11 @@ Mapping {
     AppProperty { id: playPreviewPlayer; path: "app.traktor.browser.preview_player.play" }
     AppProperty { id: loadPlayPreviewPlayer; path: "app.traktor.browser.preview_player.load_or_play" }
     AppProperty { id: seekPreviewPlayer; path: "app.traktor.browser.preview_player.seek" }
+    //`unload` is a trigger property: assigning true a second time is not a
+    //change and emits no signal. Reset it so it can fire again.
+    Timer { id: previewUnloadReset; interval: 1
+        onTriggered: { unloadPreviewPlayer.value = false }
+    }
 
     //Master
     AppProperty { id: masterId; path: "app.traktor.masterclock.source_id" } //-1: MasterClock, 0: Deck A, 1: Deck B, 2: Deck C, 3: Deck D
@@ -306,9 +311,12 @@ Mapping {
         if (side.screenView == ScreenView.browser) {
             if (traktorRelatedBrowser.value) fullscreenBrowser.value = true
         }
-        else if (side.screenView != ScreenView.deck) {
-            if (traktorRelatedBrowser.value) fullscreenBrowser.value = false
+        //Also unload when returning to the deck view - that is the common case
+        //and it was excluded by the `!= ScreenView.deck` condition.
+        else {
+            if (traktorRelatedBrowser.value && side.screenView != ScreenView.deck) fullscreenBrowser.value = false
             unloadPreviewPlayer.value = true
+            previewUnloadReset.restart()
         }
     }
 }
