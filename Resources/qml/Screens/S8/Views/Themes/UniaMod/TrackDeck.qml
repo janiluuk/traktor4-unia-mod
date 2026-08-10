@@ -29,6 +29,7 @@ Item {
   //Artwork
   Widgets.ArtworkBox {
     id: artwork_box
+    deckId: parent.deckId
     anchors.top: deck_header.top
     anchors.bottom: deck_header.bottom
     anchors.left: deck_header.left

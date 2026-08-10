@@ -434,7 +434,10 @@ FullscreenOverlay {
 
     MappingProperty { id: settingsPush; path: propertiesPath + ".preferencesPush";
         onValueChanged: {
-            if (settingsPush.value) {
+            { //browse.push is wired through a TogglePropertyAdapter, so the value
+              //alternates true/false on every press. Acting only on `true` made
+              //every second press a no-op. The back button has no such guard,
+              //which is why that one always responded.
                 if (firstIndex == 0) {
                     // Navigate to selected menu item
                     firstSettingsList.selectedIndex = firstSettingsList.currentIndex+1; backBright.value = true
