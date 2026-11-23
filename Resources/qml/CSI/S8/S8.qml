@@ -230,6 +230,11 @@ Mapping {
     AppProperty { id: playPreviewPlayer; path: "app.traktor.browser.preview_player.play" }
     AppProperty { id: loadPlayPreviewPlayer; path: "app.traktor.browser.preview_player.load_or_play" }
     AppProperty { id: seekPreviewPlayer; path: "app.traktor.browser.preview_player.seek" }
+    //`unload` is a trigger property: assigning true a second time is not a
+    //change and emits no signal. Reset it so it can fire again.
+    Timer { id: previewUnloadReset; interval: 1
+        onTriggered: { unloadPreviewPlayer.value = false }
+    }
 
     //FXs
     AppProperty { id: fxMode; path: "app.traktor.fx.4fx_units" }
@@ -322,6 +327,8 @@ Mapping {
             }
             if (right.screenView != ScreenView.browser) {
                 unloadPreviewPlayer.value = true
+                previewUnloadReset.restart()
+                previewUnloadReset.restart()
             }
         }
     }

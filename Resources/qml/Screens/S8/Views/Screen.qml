@@ -427,10 +427,33 @@ Item {
 
     //Deck
     property int sideHeight: screen.height - side.anchors.bottomMargin
+    //The D2 has a single screen, so isLeftScreen stays true and the hardcoded
+    //ids above always resolved to deck 1/3. Derive them from the deck assignment
+    //instead, exactly like CSI/D2/D2.qml already does for the controller side.
+    MappingProperty { id: screenDecksAssignment; path: "mapping.settings.decks_assignment" }
+    readonly property bool isTraktorD2: screen.flavor == ScreenFlavor.D2
+    function d2TopDeck(a) {
+        switch (a) {
+            case DecksAssignment.AB: return 1;
+            case DecksAssignment.AC: return 1;
+            case DecksAssignment.BD: return 2;
+            case DecksAssignment.CD: return 3;
+        }
+        return 1;
+    }
+    function d2BottomDeck(a) {
+        switch (a) {
+            case DecksAssignment.AB: return 2;
+            case DecksAssignment.AC: return 3;
+            case DecksAssignment.BD: return 4;
+            case DecksAssignment.CD: return 4;
+        }
+        return 3;
+    }
     Side {
         id: side
-        topDeckId: isLeftScreen ? 1 : 2 //TO-DO: revise this with the DeckAssignement
-        bottomDeckId: isLeftScreen ? 3 : 4 //TO-DO: revise this with the DeckAssignement
+        topDeckId:    isTraktorD2 ? d2TopDeck(screenDecksAssignment.value)    : (isLeftScreen ? 1 : 2)
+        bottomDeckId: isTraktorD2 ? d2BottomDeck(screenDecksAssignment.value) : (isLeftScreen ? 3 : 4)
 
         anchors.fill: parent
         anchors.bottomMargin: bottomControls.sizeState != "hide" && !hideBottomPanel.value ? bottomControls.smallStateHeight : 0
